@@ -74,16 +74,21 @@ public class Menu {
             categorizedMenu.get(dish.category()).add(dish);
         }
 
-        System.out.println("\n========== " + messages.getString("menu") + " ==========");
+        System.out.println("\n" + "=".repeat(40));
+        System.out.println(" " + messages.getString("menu"));
+        System.out.println("=".repeat(40));
+
         for (Dish.Category category : Dish.Category.values()) {
             if (categorizedMenu.get(category).isEmpty()) continue;
-            System.out.println(messages.getString(category.name()));
+            System.out.println("\n" + messages.getString(category.name()));
+            System.out.println("-".repeat(40));
             for (Dish dish : categorizedMenu.get(category)) {
-                System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price());
+                System.out.printf("%-3s %-25s (€ %.2f)%n", 
+                    (dishes.indexOf(dish) + 1) + ".", dish.name(), dish.price());
             }
-            System.out.println();
         }
-        System.out.println("===================================================");
+
+        System.out.println("=".repeat(40));
     }
 
     /**

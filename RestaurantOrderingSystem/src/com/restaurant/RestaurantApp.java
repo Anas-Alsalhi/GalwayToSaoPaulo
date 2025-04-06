@@ -57,6 +57,8 @@ public class RestaurantApp {
             messages = ResourceBundle.getBundle("com.restaurant.messages", Locale.ENGLISH);
         }
 
+        System.out.println();
+        System.out.println("============================================");
         System.out.println(messages.getString("welcome"));
         System.out.println(messages.getString("tagline"));
         System.out.println("============================================\n");
@@ -127,12 +129,16 @@ public class RestaurantApp {
         Order order = new Order(table, waiter);
         List<Dish> allDishes = menu.getAllDishes();
 
-        System.out.println("\n========== " + messages.getString("menu") + " ==========");
+        System.out.println("\n" + "=".repeat(50));
+        System.out.printf("%25s%n", messages.getString("menu"));
+        System.out.println("=".repeat(50));
+
         for (int i = 0; i < allDishes.size(); i++) {
             Dish dish = allDishes.get(i);
-            System.out.printf("%d. %-25s (%s %.2f)%n", i + 1, dish.name(), messages.getString("currency"), dish.price());
+            System.out.printf("%-3d %-30s (€ %.2f)%n", i + 1, dish.name(), dish.price());
         }
-        System.out.println("==========================");
+
+        System.out.println("=".repeat(50));
 
         while (true) {
             System.out.print(messages.getString("enter_dish_number"));
