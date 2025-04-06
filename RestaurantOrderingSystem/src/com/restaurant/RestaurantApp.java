@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Main application for managing the restaurant system.
@@ -173,16 +174,15 @@ public class RestaurantApp {
 
         System.out.println("\n" + messages.getString("order_summary"));
         System.out.println(messages.getString("table_details"));
-        System.out.printf(messages.getString("table_number") + "%n", table.getTableNumber());
-        System.out.printf("  %s %d %s%n", messages.getString("capacity"), table.getCapacity(), messages.getString("customers"));
-        System.out.printf("  %s %d %s%n", messages.getString("seated_customers"), seatedCustomers, messages.getString("customers"));
-        System.out.printf(messages.getString("waiter") + "%n", waiter.getName());
+        System.out.println(String.format("  %s", String.format(messages.getString("capacity"), table.getCapacity())));
+        System.out.println(String.format("  %s", String.format(messages.getString("seated_customers"), seatedCustomers)));
+        System.out.println(String.format("  %s", String.format(messages.getString("waiter"), waiter.getName())));
 
         System.out.println("\n" + messages.getString("ordered_items"));
         order.printDetails();
 
         double total = order.getDishes().stream().mapToDouble(Dish::price).sum();
-        System.out.printf(messages.getString("subtotal") + "%n", total); // Pass 'total' as an argument
+        System.out.println(String.format("\n%s", String.format(messages.getString("subtotal"), total)));
 
         double discount = 0;
         while (true) {
@@ -206,16 +206,38 @@ public class RestaurantApp {
         }
 
         double discountedTotal = total - (total * (discount / 100));
-        System.out.printf(messages.getString("total_after_discount") + "%n", discountedTotal);
+        System.out.println(String.format("\n%s", String.format(messages.getString("total_after_discount"), discountedTotal)));
 
         order.setDiscountPercentage(discount);
         order.setFinalPrice(discountedTotal);
 
-        // Add timestamp to the order
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", locale);
-        String formattedTimestamp = String.format(messages.getString("order_timestamp"), now.format(formatter));
-        System.out.println(formattedTimestamp);
+        System.out.println(String.format("\n%s", String.format(messages.getString("order_timestamp"), now.format(formatter))));
+
+        // Use CountDownLatch to simulate dish preparation
+        CountDownLatch latch = new CountDownLatch(order.getDishes().size());
+        try (ExecutorService executor = Executors.newFixedThreadPool(3)) {
+            for (Dish dish : order.getDishes()) {
+                executor.submit(() -> {
+                    try {
+                        System.out.printf(messages.getString("preparing_dish"), dish.name());
+                        Thread.sleep(1000 + random.nextInt(2000)); // Simulate preparation time
+                        System.out.printf(messages.getString("prepared_dish"), dish.name());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            latch.await(); // Wait for all dishes to be prepared
+            System.out.println("\n" + messages.getString("all_dishes_prepared")); // Added empty line
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println(messages.getString("preparation_interrupted"));
+        }
 
         try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
             Future<String> processingTask = executor.submit(() -> {
@@ -223,14 +245,14 @@ public class RestaurantApp {
                 return messages.getString("order_processed");
             });
 
-            System.out.println(processingTask.get());
+            System.out.println("\n" + processingTask.get()); // Added empty line
         } catch (Exception e) {
             System.err.println(messages.getString("order_failed") + ": " + e.getMessage());
         }
 
         if (!orderHistory.getOrders().contains(order)) {
             orderHistory.addOrder(order);
-            System.out.println(messages.getString("order_added_history"));
+            System.out.println("\n" + messages.getString("order_added_history")); // Added empty line
         }
     }
 }

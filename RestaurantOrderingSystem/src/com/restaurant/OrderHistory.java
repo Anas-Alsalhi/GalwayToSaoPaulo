@@ -120,10 +120,10 @@ public class OrderHistory {
         System.out.println("=".repeat(40));
 
         System.out.println(messages.getString("table_details"));
-        System.out.printf("  %s %d%n", messages.getString("table_number"), order.getTable().getTableNumber());
-        System.out.printf("  %s %d %s%n", messages.getString("capacity"), order.getTable().getCapacity(), messages.getString("customers"));
-        System.out.printf("  %s %s%n", messages.getString("seated_customers"), order.getTable().getCapacity());
-        System.out.printf("  %s %s%n", messages.getString("waiter"), order.getWaiter().getName());
+        System.out.printf("  %s: %d%n", messages.getString("table_number"), order.getTable().getTableNumber());
+        System.out.printf("  %s: %d %s%n", messages.getString("capacity"), order.getTable().getCapacity(), messages.getString("customers"));
+        System.out.printf("  %s: %d %s%n", messages.getString("seated_customers"), order.getTable().getCapacity(), messages.getString("customers"));
+        System.out.printf("  %s: %s%n", messages.getString("waiter"), order.getWaiter().getName());
 
         System.out.println("\n" + messages.getString("ordered_items"));
         System.out.println("-".repeat(40));
@@ -133,14 +133,14 @@ public class OrderHistory {
         System.out.println("-".repeat(40));
 
         double subtotal = order.getDishes().stream().mapToDouble(Dish::price).sum();
-        System.out.printf("  %s %.2f%n", messages.getString("subtotal"), subtotal);
+        System.out.printf("  %s: €%.2f%n", messages.getString("subtotal"), subtotal);
 
         double discount = getValidDiscount(messages);
         if (discount < 0) return; // Exit if invalid input
 
         double discountedTotal = subtotal - (subtotal * (discount / 100));
         System.out.println();
-        System.out.printf("  %s %.2f%n", messages.getString("total_after_discount"), discountedTotal);
+        System.out.printf("  %s: €%.2f%n", messages.getString("total_after_discount"), discountedTotal);
         System.out.println();
 
         order.setDiscountPercentage(discount);
@@ -151,39 +151,39 @@ public class OrderHistory {
         System.out.printf("  %s: %s%n", messages.getString("order_timestamp"), now.format(formatter));
         System.out.println();
 
+        System.out.println("=".repeat(40));
+        System.out.println(messages.getString("all_dishes_prepared"));
         System.out.println(messages.getString("order_processed"));
-        System.out.println();
         System.out.println(messages.getString("order_added_history"));
-        System.out.println();
-
         System.out.println("=".repeat(40));
     }
 
     // Updated discount input method
     private double getValidDiscount(ResourceBundle messages) {
-        Scanner scanner = new Scanner(System.in);
-        double discount;
+        try (Scanner scanner = new Scanner(System.in)) { // Use try-with-resources to ensure scanner is closed
+            double discount;
 
-        while (true) {
-            System.out.print(messages.getString("enter_discount"));
-            String discountInput = scanner.nextLine().trim();
+            while (true) {
+                System.out.print(messages.getString("enter_discount"));
+                String discountInput = scanner.nextLine().trim();
 
-            if (discountInput.isEmpty()) {
-                return 0; // No discount
-            }
-
-            try {
-                discount = Double.parseDouble(discountInput);
-                if (discount >= 0 && discount <= 25) {
-                    break; // Valid discount
-                } else {
-                    System.out.println(messages.getString("invalid_discount_range"));
+                if (discountInput.isEmpty()) {
+                    return 0; // No discount
                 }
-            } catch (NumberFormatException e) {
-                System.out.println(messages.getString("invalid_discount_format"));
-            }
-        }
 
-        return discount;
+                try {
+                    discount = Double.parseDouble(discountInput);
+                    if (discount >= 0 && discount <= 25) {
+                        break; // Valid discount
+                    } else {
+                        System.out.println(messages.getString("invalid_discount_range"));
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(messages.getString("invalid_discount_format"));
+                }
+            }
+
+            return discount;
+        }
     }
 }
