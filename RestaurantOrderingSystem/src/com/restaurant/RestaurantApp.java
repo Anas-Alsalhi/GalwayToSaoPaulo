@@ -60,7 +60,7 @@ public class RestaurantApp {
 
         System.out.println();
         System.out.println("============================================");
-        System.out.println(messages.getString("welcome").replace("Sabor Brasilero", "Galway to São Paulo"));
+        System.out.println(messages.getString("welcome").replace("Sabor Brasileiro", "Galway To São Paulo Restaurant"));
         System.out.println(messages.getString("tagline"));
         System.out.println("============================================\n");
 
