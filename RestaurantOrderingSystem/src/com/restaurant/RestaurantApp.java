@@ -1,5 +1,7 @@
 package com.restaurant;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -53,12 +55,14 @@ public class RestaurantApp {
                 case 5 -> {
                     System.out.print("Enter file name to save history: ");
                     String fileName = scanner.nextLine();
-                    orderHistory.saveToFile(fileName);
+                    Path filePath = Paths.get(fileName);
+                    orderHistory.saveToFile(filePath);
                 }
                 case 6 -> {
                     System.out.print("Enter file name to load history: ");
                     String fileName = scanner.nextLine();
-                    orderHistory.loadFromFile(fileName);
+                    Path filePath = Paths.get(fileName);
+                    orderHistory.loadFromFile(filePath);
                 }
                 case 7 -> {
                     System.out.println("\nThank you for visiting Sabor Brasileiro!");

@@ -99,4 +99,19 @@ public class Menu {
     public List<Dish> getAllDishes() {
         return Collections.unmodifiableList(dishes);
     }
+
+    /**
+     * Finds a dish by its name.
+     *
+     * @param name The name of the dish.
+     * @return The Dish object if found, otherwise null.
+     */
+    public static Dish findDishByName(String name) {
+        for (Dish dish : new Menu().getAllDishes()) {
+            if (dish.name().equalsIgnoreCase(name)) {
+                return dish;
+            }
+        }
+        return null;
+    }
 }

@@ -86,6 +86,44 @@ public class Order implements Serializable {
         }
     }
 
+    /**
+     * Parses a string representation of an Order and returns an Order object.
+     * Assumes the string is in the format: "TableNumber,WaiterName,WaiterId,Dish1,Dish2,..."
+     *
+     * @param orderString The string representation of the order.
+     * @return The parsed Order object.
+     * @throws IllegalArgumentException If the string format is invalid.
+     */
+    public static Order parse(String orderString) {
+        String[] parts = orderString.split(",");
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Invalid order string format.");
+        }
+
+        int tableNumber = Integer.parseInt(parts[0]);
+        String waiterName = parts[1];
+        int waiterId = Integer.parseInt(parts[2]);
+
+        Table table = new Table(tableNumber, 4); // Default capacity
+        Waiter waiter = new Waiter(waiterName, waiterId);
+        Order order = new Order(table, waiter);
+
+        for (int i = 3; i < parts.length; i++) {
+            String dishName = parts[i];
+            // Assuming a method to find a dish by name exists in the Menu class
+            Dish dish = Menu.findDishByName(dishName);
+            if (dish != null) {
+                try {
+                    order.addDish(dish);
+                } catch (InvalidOrderException e) {
+                    System.err.println("Failed to add dish: " + e.getMessage());
+                }
+            }
+        }
+
+        return order;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
