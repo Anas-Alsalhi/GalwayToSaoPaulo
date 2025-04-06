@@ -161,16 +161,16 @@ public class RestaurantApp {
 
         System.out.println("\n" + messages.getString("order_summary"));
         System.out.println(messages.getString("table_details"));
-        System.out.printf(" - " + messages.getString("table_number") + ": %d%n", table.getTableNumber());
-        System.out.printf(" - " + messages.getString("capacity") + ": %d " + messages.getString("customers") + "%n", table.getCapacity());
-        System.out.printf(" - " + messages.getString("seated_customers") + ": %d%n", seatedCustomers);
-        System.out.printf(" - " + messages.getString("waiter") + ": %s%n", waiter.getName());
+        System.out.printf(messages.getString("table_number") + "%n", table.getTableNumber());
+        System.out.printf(messages.getString("capacity") + "%n", table.getCapacity());
+        System.out.printf(messages.getString("seated_customers") + "%n", seatedCustomers);
+        System.out.printf(messages.getString("waiter") + "%n", waiter.getName());
 
         System.out.println("\n" + messages.getString("ordered_items"));
         order.printDetails();
 
         double total = order.getDishes().stream().mapToDouble(Dish::price).sum();
-        System.out.printf(messages.getString("subtotal") + ": %.2f%n", total);
+        System.out.printf(messages.getString("subtotal") + "%n", total); // Pass 'total' as an argument
 
         System.out.print(messages.getString("enter_discount"));
         String discountInput = scanner.nextLine().trim();
@@ -178,7 +178,7 @@ public class RestaurantApp {
         if (discount < 0 || discount > 100) discount = 0.0;
 
         double discountedTotal = total - (total * (discount / 100));
-        System.out.printf(messages.getString("total_after_discount") + ": %.2f%n", discountedTotal);
+        System.out.printf(messages.getString("total_after_discount") + "%n", discountedTotal);
 
         order.setDiscountPercentage(discount);
         order.setFinalPrice(discountedTotal);

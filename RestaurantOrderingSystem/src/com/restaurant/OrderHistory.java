@@ -4,20 +4,26 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 
 /**
  * Manages the history of orders.
  */
 public class OrderHistory {
 
-    private final List<Order> orders = new ArrayList<>();
+    private final List<Order> orders = new CopyOnWriteArrayList<>(); // Thread-safe list
 
     public void addOrder(Order order) {
         orders.add(order);
     }
 
     public List<Order> getOrders() {
-        return new ArrayList<>(orders);
+        return new ArrayList<>(orders); // Return a copy to avoid external modification
     }
 
     public void displayHistory() {
@@ -54,7 +60,7 @@ public class OrderHistory {
         }
     }
 
-    // New method: Save order history as plain text using BufferedWriter
+    // Save order history as plain text using BufferedWriter
     public void saveAsText(Path filePath) {
         try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
             for (Order order : orders) {
@@ -67,7 +73,7 @@ public class OrderHistory {
         }
     }
 
-    // New method: Load order history from plain text using BufferedReader
+    // Load order history from plain text using BufferedReader
     public void loadFromText(Path filePath) {
         if (!Files.exists(filePath)) {
             System.out.println("File does not exist: " + filePath);
@@ -90,7 +96,7 @@ public class OrderHistory {
         }
     }
 
-    // New method: Demonstrate path handling
+    // Demonstrate path handling
     public void demonstratePathHandling(Path basePath, String relativePath) {
         Path resolvedPath = basePath.resolve(relativePath);
         Path normalizedPath = resolvedPath.normalize();
@@ -101,5 +107,79 @@ public class OrderHistory {
         System.out.println("Resolved Path: " + resolvedPath);
         System.out.println("Normalized Path: " + normalizedPath);
         System.out.println("Relativized Path: " + relativizedPath);
+    }
+
+    // Display order summary with better formatting
+    public void displayOrderSummary(Order order, ResourceBundle messages, Locale locale) {
+        System.out.println("\n" + "=".repeat(40));
+        System.out.println(" " + messages.getString("order_summary"));
+        System.out.println("=".repeat(40));
+
+        System.out.println(messages.getString("table_details"));
+        System.out.printf("  %s %d%n", messages.getString("table_number"), order.getTable().getTableNumber());
+        System.out.printf("  %s %d %s%n", messages.getString("capacity"), order.getTable().getCapacity(), messages.getString("customers"));
+        System.out.printf("  %s %s%n", messages.getString("seated_customers"), order.getTable().getCapacity());
+        System.out.printf("  %s %s%n", messages.getString("waiter"), order.getWaiter().getName());
+
+        System.out.println("\n" + messages.getString("ordered_items"));
+        System.out.println("-".repeat(40));
+        order.getDishes().forEach(dish ->
+            System.out.printf("  - %-25s (€%.2f)%n", dish.name(), dish.price())
+        );
+        System.out.println("-".repeat(40));
+
+        double subtotal = order.getDishes().stream().mapToDouble(Dish::price).sum();
+        System.out.printf("  %s %.2f%n", messages.getString("subtotal"), subtotal);
+
+        double discount = getValidDiscount(messages);
+        if (discount < 0) return; // Exit if invalid input
+
+        double discountedTotal = subtotal - (subtotal * (discount / 100));
+        System.out.println();
+        System.out.printf("  %s %.2f%n", messages.getString("total_after_discount"), discountedTotal);
+        System.out.println();
+
+        order.setDiscountPercentage(discount);
+        order.setFinalPrice(discountedTotal);
+
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", locale);
+        System.out.printf("  %s: %s%n", messages.getString("order_timestamp"), now.format(formatter));
+        System.out.println();
+
+        System.out.println(messages.getString("order_processed"));
+        System.out.println();
+        System.out.println(messages.getString("order_added_history"));
+        System.out.println();
+
+        System.out.println("=".repeat(40));
+    }
+
+    // Updated discount input method
+    private double getValidDiscount(ResourceBundle messages) {
+        Scanner scanner = new Scanner(System.in);
+        double discount;
+
+        while (true) {
+            System.out.print(messages.getString("enter_discount"));
+            String discountInput = scanner.nextLine().trim();
+
+            if (discountInput.isEmpty()) {
+                return 0; // No discount
+            }
+
+            try {
+                discount = Double.parseDouble(discountInput);
+                if (discount >= 0 && discount <= 25) {
+                    break;
+                } else {
+                    System.out.println(messages.getString("invalid_discount_range"));
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(messages.getString("invalid_discount_format"));
+            }
+        }
+
+        return discount;
     }
 }
