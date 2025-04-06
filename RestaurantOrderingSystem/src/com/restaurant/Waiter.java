@@ -1,16 +1,14 @@
 package com.restaurant;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a waiter in the restaurant.
  */
-public final class Waiter extends Staff implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public final class Waiter extends Staff {
 
     private int waiterId;
     private List<Table> assignedTables;
@@ -54,5 +52,18 @@ public final class Waiter extends Staff implements Serializable {
     @Override
     public void performDuties() {
         System.out.println(getName() + " (ID: " + waiterId + ") is serving customers and ensuring orders are delivered promptly.");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Waiter waiter = (Waiter) obj;
+        return waiterId == waiter.waiterId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(waiterId);
     }
 }

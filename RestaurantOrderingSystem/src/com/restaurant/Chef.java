@@ -1,11 +1,10 @@
 package com.restaurant;
 
-import java.io.Serializable;
 
 /**
  * Represents a chef in the restaurant.
  */
-public class Chef extends Staff implements Serializable {
+public class Chef extends Staff {
 
     private static final long serialVersionUID = 1L;
 

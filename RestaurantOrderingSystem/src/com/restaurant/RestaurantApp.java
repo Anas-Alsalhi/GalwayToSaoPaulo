@@ -2,7 +2,9 @@ package com.restaurant;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.Random;
 
 /**
@@ -101,11 +103,15 @@ public class RestaurantApp {
                     if (choice == 0) break;
                     if (choice > 0 && choice <= allDishes.size()) {
                         Dish selectedDish = allDishes.get(choice - 1);
-                        try {
-                            order.addDish(selectedDish);
-                            System.out.printf("Added: %s (€%.2f)%n", selectedDish.name(), selectedDish.price());
-                        } catch (InvalidOrderException e) {
-                            System.out.println("Error: " + e.getMessage());
+                        if (menu.isDishAvailable(selectedDish)) {
+                            try {
+                                order.addDish(selectedDish);
+                                System.out.printf("Added: %s (€%.2f)%n", selectedDish.name(), selectedDish.price());
+                            } catch (InvalidOrderException e) {
+                                System.out.println("Error: " + e.getMessage());
+                            }
+                        } else {
+                            System.out.println("The selected dish is not available.");
                         }
                     } else {
                         System.out.println("Invalid number. Please try again.");
@@ -140,14 +146,12 @@ public class RestaurantApp {
             order.setDiscountPercentage(discount);
             order.setFinalPrice(discountedTotal);
 
-            try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-                var processingTask = scope.fork(() -> {
+            try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+                Future<String> processingTask = executor.submit(() -> {
                     Thread.sleep(2000);
                     return "Order processed successfully!";
                 });
 
-                scope.join();
-                scope.throwIfFailed();
                 System.out.println(processingTask.get());
             } catch (Exception e) {
                 System.err.println("Order processing failed: " + e.getMessage());

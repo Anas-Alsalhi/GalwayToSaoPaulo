@@ -86,6 +86,16 @@ public class Menu {
         System.out.println("======================================");
     }
 
+    /**
+     * Checks if a specific dish is available in the menu.
+     *
+     * @param dish The dish to check.
+     * @return True if the dish is available, false otherwise.
+     */
+    public boolean isDishAvailable(Dish dish) {
+        return dishes.contains(dish);
+    }
+
     public List<Dish> getAllDishes() {
         return Collections.unmodifiableList(dishes);
     }

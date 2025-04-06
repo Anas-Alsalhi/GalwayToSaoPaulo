@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents an order placed in the restaurant.
@@ -83,5 +84,18 @@ public class Order implements Serializable {
         for (Dish dish : dishes) {
             System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price());
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Order order = (Order) obj;
+        return table.equals(order.table) && waiter.equals(order.waiter);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(table, waiter);
     }
 }
