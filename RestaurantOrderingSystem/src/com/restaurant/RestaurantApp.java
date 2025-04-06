@@ -28,21 +28,23 @@ public class RestaurantApp {
         boolean exit = false;
 
         // Prompt user to select a language
+        System.out.println("============================================");
         System.out.println("Select a language:");
         System.out.println("1. English");
-        System.out.println("2. French");
-        System.out.println("3. Italian");
-        System.out.println("4. Spanish");
-        System.out.println("5. Portuguese");
+        System.out.println("2. Portuguese");
+        System.out.println("3. French");
+        System.out.println("4. Italian");
+        System.out.println("5. Spanish");
+        System.out.println("============================================");
         int languageChoice = scanner.nextInt();
         scanner.nextLine();
 
         // Set locale based on user choice
         Locale locale = switch (languageChoice) {
-            case 2 -> Locale.of("fr", "FR");
-            case 3 -> Locale.of("it", "IT");
-            case 4 -> Locale.of("es", "ES");
-            case 5 -> Locale.of("pt", "PT");
+            case 2 -> Locale.of("pt", "PT");
+            case 3 -> Locale.of("fr", "FR");
+            case 4 -> Locale.of("it", "IT");
+            case 5 -> Locale.of("es", "ES");
             default -> Locale.ENGLISH;
         };
 
@@ -166,8 +168,8 @@ public class RestaurantApp {
         System.out.println("\n" + messages.getString("order_summary"));
         System.out.println(messages.getString("table_details"));
         System.out.printf(messages.getString("table_number") + "%n", table.getTableNumber());
-        System.out.printf(messages.getString("capacity") + "%n", table.getCapacity());
-        System.out.printf(messages.getString("seated_customers") + "%n", seatedCustomers);
+        System.out.printf("  %s %d %s%n", messages.getString("capacity"), table.getCapacity(), messages.getString("customers"));
+        System.out.printf("  %s %d %s%n", messages.getString("seated_customers"), seatedCustomers, messages.getString("customers"));
         System.out.printf(messages.getString("waiter") + "%n", waiter.getName());
 
         System.out.println("\n" + messages.getString("ordered_items"));
@@ -176,18 +178,25 @@ public class RestaurantApp {
         double total = order.getDishes().stream().mapToDouble(Dish::price).sum();
         System.out.printf(messages.getString("subtotal") + "%n", total); // Pass 'total' as an argument
 
-        System.out.print(messages.getString("enter_discount"));
-        String discountInput = scanner.nextLine().trim();
-        double discount;
-        try {
-            discount = Double.parseDouble(discountInput);
-            if (discount < 0 || discount > 25) {
-                System.out.println(messages.getString("invalid_discount_range"));
-                discount = 0; // Default to no discount
+        double discount = 0;
+        while (true) {
+            System.out.print(messages.getString("enter_discount"));
+            String discountInput = scanner.nextLine().trim();
+
+            if (discountInput.isEmpty()) {
+                break; // No discount
             }
-        } catch (NumberFormatException e) {
-            System.out.println(messages.getString("invalid_discount_format"));
-            discount = 0; // Default to no discount
+
+            try {
+                discount = Double.parseDouble(discountInput);
+                if (discount >= 0 && discount <= 25) {
+                    break; // Valid discount
+                } else {
+                    System.out.println(messages.getString("invalid_discount_range"));
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(messages.getString("invalid_discount_format"));
+            }
         }
 
         double discountedTotal = total - (total * (discount / 100));
@@ -199,7 +208,8 @@ public class RestaurantApp {
         // Add timestamp to the order
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", locale);
-        System.out.println(messages.getString("order_timestamp") + ": " + now.format(formatter));
+        String formattedTimestamp = String.format(messages.getString("order_timestamp"), now.format(formatter));
+        System.out.println(formattedTimestamp);
 
         try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
             Future<String> processingTask = executor.submit(() -> {
