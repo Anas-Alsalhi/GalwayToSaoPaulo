@@ -3,12 +3,13 @@ package com.restaurant;
 import java.util.*;
 
 /**
- * Represents the restaurant's menu.
+ * Represents the Brazilian and Irish restaurant's menu.
  */
 public class Menu {
 
     private final List<Dish> dishes;
-    private final List<Dish> brazilianDishes; // List of Brazilian dishes for today's specials
+    private final List<Dish> irishDishes; // List of Irish dishes for today's specials
+    private List<Dish> cachedSpecials = null; // Cache for today's specials
 
     /**
      * Constructor for initializing the menu.
@@ -17,35 +18,46 @@ public class Menu {
         // Full menu
         dishes = List.of(
             new Dish("Pão de Queijo", 5.99, Dish.Category.APPETIZER),
-            new Dish("Salad", 7.49, Dish.Category.APPETIZER),
+            new Dish("Salad", 6.99, Dish.Category.APPETIZER), // Adjusted price
             new Dish("Bruschetta", 6.99, Dish.Category.APPETIZER),
             new Dish("Fish Cake", 6.49, Dish.Category.APPETIZER),
-            new Dish("Falafel", 8.99, Dish.Category.APPETIZER),
+            new Dish("Colcannon", 7.99, Dish.Category.APPETIZER), // Adjusted price
+            new Dish("Boxty", 7.99, Dish.Category.APPETIZER),
             new Dish("Feijoada", 14.99, Dish.Category.MAIN_COURSE),
             new Dish("Churrasco", 15.99, Dish.Category.MAIN_COURSE),
             new Dish("Irish Stew", 12.99, Dish.Category.MAIN_COURSE),
             new Dish("Bacon and Cabbage", 13.99, Dish.Category.MAIN_COURSE),
             new Dish("Pasta", 12.99, Dish.Category.MAIN_COURSE),
-            new Dish("Pizza", 9.99, Dish.Category.MAIN_COURSE),
+            new Dish("Pizza", 10.99, Dish.Category.MAIN_COURSE), // Adjusted price
             new Dish("Fish and Chips", 10.99, Dish.Category.MAIN_COURSE),
+            new Dish("Shepherd's Pie", 13.49, Dish.Category.MAIN_COURSE),
+            new Dish("Irish Full Breakfast", 14.99, Dish.Category.MAIN_COURSE),
             new Dish("Tea", 2.49, Dish.Category.BEVERAGE),
             new Dish("Coffee", 2.99, Dish.Category.BEVERAGE),
             new Dish("Latte", 3.99, Dish.Category.BEVERAGE),
             new Dish("Orange Juice", 3.49, Dish.Category.BEVERAGE),
             new Dish("Apple Juice", 3.99, Dish.Category.BEVERAGE),
-            new Dish("Pineapple Juice", 4.49, Dish.Category.BEVERAGE),
-            new Dish("Brigadeiro", 3.99, Dish.Category.DESSERT),
-            new Dish("Tiramisu", 4.99, Dish.Category.DESSERT),
-            new Dish("Baklava", 5.49, Dish.Category.DESSERT)
+            new Dish("Pineapple Juice", 3.99, Dish.Category.BEVERAGE), // Adjusted price
+            new Dish("Apple Tart", 4.99, Dish.Category.DESSERT),
+            new Dish("Baileys Cheesecake", 5.49, Dish.Category.DESSERT),
+            new Dish("Irish Cream Brownie", 3.99, Dish.Category.DESSERT)
         );
 
-        // Brazilian dishes only (use a mutable list to avoid UnsupportedOperationException)
-        brazilianDishes = new ArrayList<>(List.of(
-            new Dish("Pão de Queijo", 5.99, Dish.Category.APPETIZER),
-            new Dish("Feijoada", 14.99, Dish.Category.MAIN_COURSE),
-            new Dish("Churrasco", 15.99, Dish.Category.MAIN_COURSE),
-            new Dish("Brigadeiro", 3.99, Dish.Category.DESSERT),
-            new Dish("Pineapple Juice", 4.49, Dish.Category.BEVERAGE)
+        // Irish dishes only (use a mutable list to avoid UnsupportedOperationException)
+        irishDishes = new ArrayList<>(List.of(
+            new Dish("Irish Stew", 12.99, Dish.Category.MAIN_COURSE),
+            new Dish("Bacon and Cabbage", 13.99, Dish.Category.MAIN_COURSE),
+            new Dish("Colcannon", 7.99, Dish.Category.APPETIZER), // Adjusted price
+            new Dish("Fish and Chips", 10.99, Dish.Category.MAIN_COURSE),
+            new Dish("Baileys Cheesecake", 5.49, Dish.Category.DESSERT),
+            new Dish("Irish Cream Brownie", 3.99, Dish.Category.DESSERT),
+            new Dish("Tea", 2.49, Dish.Category.BEVERAGE),
+            new Dish("Boxty", 7.99, Dish.Category.APPETIZER), // New Irish appetizer
+            new Dish("Shepherd's Pie", 13.49, Dish.Category.MAIN_COURSE), // New Irish main course
+            new Dish("Irish Full Breakfast", 14.99, Dish.Category.MAIN_COURSE), // New Irish main course
+            new Dish("Salad", 6.99, Dish.Category.APPETIZER), // Adjusted price
+            new Dish("Pizza", 10.99, Dish.Category.MAIN_COURSE), // Adjusted price
+            new Dish("Pineapple Juice", 3.99, Dish.Category.BEVERAGE) // Adjusted price
         ));
     }
 
@@ -62,7 +74,7 @@ public class Menu {
             categorizedMenu.get(dish.category()).add(dish);
         }
 
-        System.out.println("\n========== FULL MENU ==========");
+        System.out.println("\n========== BRAZILIAN AND IRISH FULL MENU ==========");
         for (Dish.Category category : Dish.Category.values()) {
             if (categorizedMenu.get(category).isEmpty()) continue;
             System.out.println(category.toString().replace("_", " ") + ":");
@@ -71,19 +83,23 @@ public class Menu {
             }
             System.out.println();
         }
-        System.out.println("===============================");
+        System.out.println("===================================================");
     }
 
     /**
-     * Displays today's specials, which are chosen randomly from Brazilian dishes.
+     * Displays today's specials, which are chosen randomly from Irish dishes.
+     * The specials remain the same throughout the session.
      */
     public void displayDailySpecials() {
-        Collections.shuffle(brazilianDishes); // Shuffle the mutable list
-        System.out.println("\n========== TODAY'S SPECIALS ==========");
-        brazilianDishes.stream().limit(2).forEach(dish ->
+        if (cachedSpecials == null) {
+            Collections.shuffle(irishDishes); // Shuffle the mutable list
+            cachedSpecials = new ArrayList<>(irishDishes.stream().limit(2).toList());
+        }
+        System.out.println("\n========== TODAY'S BRAZILIAN AND IRISH SPECIALS ==========");
+        cachedSpecials.forEach(dish ->
             System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price())
         );
-        System.out.println("======================================");
+        System.out.println("==========================================================");
     }
 
     /**
@@ -104,14 +120,11 @@ public class Menu {
      * Finds a dish by its name.
      *
      * @param name The name of the dish.
-     * @return The Dish object if found, otherwise null.
+     * @return An Optional containing the Dish object if found, otherwise an empty Optional.
      */
-    public static Dish findDishByName(String name) {
-        for (Dish dish : new Menu().getAllDishes()) {
-            if (dish.name().equalsIgnoreCase(name)) {
-                return dish;
-            }
-        }
-        return null;
+    public static Optional<Dish> findDishByName(String name) {
+        return new Menu().getAllDishes().stream()
+                         .filter(dish -> dish.name().equalsIgnoreCase(name))
+                         .findFirst();
     }
 }

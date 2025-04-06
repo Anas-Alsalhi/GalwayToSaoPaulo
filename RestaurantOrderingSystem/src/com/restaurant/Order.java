@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Arrays;
 
 /**
  * Represents an order placed in the restaurant.
@@ -81,9 +82,8 @@ public class Order implements Serializable {
 
     public void printDetails() {
         System.out.printf("Order for Table %d:%n", table.getTableNumber());
-        for (Dish dish : dishes) {
-            System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price());
-        }
+        dishes.stream()
+              .forEach(dish -> System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price()));
     }
 
     /**
@@ -108,17 +108,22 @@ public class Order implements Serializable {
         Waiter waiter = new Waiter(waiterName, waiterId);
         Order order = new Order(table, waiter);
 
-        for (int i = 3; i < parts.length; i++) {
-            String dishName = parts[i];
-            // Assuming a method to find a dish by name exists in the Menu class
-            Dish dish = Menu.findDishByName(dishName);
-            if (dish != null) {
-                try {
-                    order.addDish(dish);
-                } catch (InvalidOrderException e) {
-                    System.err.println("Failed to add dish: " + e.getMessage());
-                }
-            }
+        List<String> failedDishes = new ArrayList<>();
+        Arrays.stream(parts, 3, parts.length)
+              .map(Menu::findDishByName)
+              .forEach(optionalDish -> optionalDish.ifPresentOrElse(
+                  dish -> {
+                      try {
+                          order.addDish(dish);
+                      } catch (InvalidOrderException e) {
+                          failedDishes.add(dish.name());
+                      }
+                  },
+                  () -> System.err.println("Dish not found in the menu.")
+              ));
+
+        if (!failedDishes.isEmpty()) {
+            System.err.println("Failed to add the following dishes: " + String.join(", ", failedDishes));
         }
 
         return order;

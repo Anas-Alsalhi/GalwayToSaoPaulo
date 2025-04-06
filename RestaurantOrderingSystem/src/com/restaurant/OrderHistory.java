@@ -24,9 +24,7 @@ public class OrderHistory {
         if (orders.isEmpty()) {
             System.out.println("No orders in history.");
         } else {
-            for (Order order : orders) {
-                order.printDetails();
-            }
+            orders.stream().forEach(Order::printDetails);
         }
     }
 

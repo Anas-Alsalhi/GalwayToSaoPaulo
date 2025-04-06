@@ -23,7 +23,7 @@ public class RestaurantApp {
         boolean exit = false;
 
         System.out.println("Welcome to Sabor Brasileiro!");
-        System.out.println("Authentic Brazilian Cuisine and International Favorites Await You.");
+        System.out.println("Authentic Brazilian Cuisine and Irish Favorites Await You.");
         System.out.println("============================================\n");
 
         while (!exit) {
