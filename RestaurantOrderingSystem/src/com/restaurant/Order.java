@@ -81,9 +81,16 @@ public class Order implements Serializable {
     }
 
     public void printDetails() {
+        System.out.println("\n" + "=".repeat(50));
         System.out.printf("Order for Table %d:%n", table.getTableNumber());
-        dishes.stream()
-              .forEach(dish -> System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price()));
+        System.out.println("-".repeat(50));
+        System.out.printf("%-3s %-30s %15s%n", "#", "Dish", "Price");
+        System.out.println("-".repeat(50));
+        for (int i = 0; i < dishes.size(); i++) {
+            Dish dish = dishes.get(i);
+            System.out.printf("%-3d %-30s %15s%n", i + 1, dish.name(), String.format("€%.2f", dish.price()));
+        }
+        System.out.println("=".repeat(50));
     }
 
     /**
