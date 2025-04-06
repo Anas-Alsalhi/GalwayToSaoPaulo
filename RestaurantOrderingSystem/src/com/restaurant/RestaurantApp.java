@@ -137,6 +137,10 @@ public class RestaurantApp {
             if (scanner.hasNextInt()) {
                 int choice = scanner.nextInt();
                 scanner.nextLine();
+                if (choice < 0) {
+                    System.out.println(messages.getString("invalid_number"));
+                    continue; // Reject negative numbers
+                }
                 if (choice == 0) break;
                 if (choice > 0 && choice <= allDishes.size()) {
                     Dish selectedDish = allDishes.get(choice - 1);
@@ -174,8 +178,17 @@ public class RestaurantApp {
 
         System.out.print(messages.getString("enter_discount"));
         String discountInput = scanner.nextLine().trim();
-        double discount = discountInput.matches("\\d{1,3}") ? Double.parseDouble(discountInput) : 0.0;
-        if (discount < 0 || discount > 100) discount = 0.0;
+        double discount;
+        try {
+            discount = Double.parseDouble(discountInput);
+            if (discount < 0 || discount > 25) {
+                System.out.println(messages.getString("invalid_discount_range"));
+                discount = 0; // Default to no discount
+            }
+        } catch (NumberFormatException e) {
+            System.out.println(messages.getString("invalid_discount_format"));
+            discount = 0; // Default to no discount
+        }
 
         double discountedTotal = total - (total * (discount / 100));
         System.out.printf(messages.getString("total_after_discount") + "%n", discountedTotal);

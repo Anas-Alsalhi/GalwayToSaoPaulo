@@ -98,6 +98,10 @@ public class OrderHistory {
 
     // Demonstrate path handling
     public void demonstratePathHandling(Path basePath, String relativePath) {
+        if (relativePath.startsWith("-")) {
+            System.out.println("Invalid relative path. Negative values are not allowed.");
+            return;
+        }
         Path resolvedPath = basePath.resolve(relativePath);
         Path normalizedPath = resolvedPath.normalize();
         Path relativizedPath = basePath.relativize(normalizedPath);
@@ -171,7 +175,7 @@ public class OrderHistory {
             try {
                 discount = Double.parseDouble(discountInput);
                 if (discount >= 0 && discount <= 25) {
-                    break;
+                    break; // Valid discount
                 } else {
                     System.out.println(messages.getString("invalid_discount_range"));
                 }
