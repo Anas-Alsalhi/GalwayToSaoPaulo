@@ -64,7 +64,7 @@ public class Menu {
     /**
      * Displays the menu categorized by dish type in a specific order.
      */
-    public void displayMenuByCategory() {
+    public void displayMenuByCategory(ResourceBundle messages) {
         Map<Dish.Category, List<Dish>> categorizedMenu = new LinkedHashMap<>();
         for (Dish.Category category : Dish.Category.values()) {
             categorizedMenu.put(category, new ArrayList<>());
@@ -74,10 +74,10 @@ public class Menu {
             categorizedMenu.get(dish.category()).add(dish);
         }
 
-        System.out.println("\n========== BRAZILIAN AND IRISH FULL MENU ==========");
+        System.out.println("\n========== " + messages.getString("menu") + " ==========");
         for (Dish.Category category : Dish.Category.values()) {
             if (categorizedMenu.get(category).isEmpty()) continue;
-            System.out.println(category.toString().replace("_", " ") + ":");
+            System.out.println(messages.getString(category.name()));
             for (Dish dish : categorizedMenu.get(category)) {
                 System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price());
             }
