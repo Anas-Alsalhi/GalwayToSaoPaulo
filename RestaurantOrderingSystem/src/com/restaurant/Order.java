@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents an order placed in the restaurant.
@@ -79,20 +81,33 @@ public class Order implements Serializable {
     public double getDiscountPercentage() {
         return discountPercentage;
     }
-
+   
     public void printDetails() {
-        System.out.println("\n" + "=".repeat(50));
-        System.out.printf("Order for Table %d:%n", table.getTableNumber());
-        System.out.println("-".repeat(50));
-        System.out.printf("%-3s %-30s %15s%n", "#", "Dish", "Price");
-        System.out.println("-".repeat(50));
-        for (int i = 0; i < dishes.size(); i++) {
-            Dish dish = dishes.get(i);
-            System.out.printf("%-3d %-30s %15s%n", i + 1, dish.name(), String.format("€%.2f", dish.price()));
+        Map<Dish, Long> dishCounts = dishes.stream()
+            .collect(Collectors.groupingBy(d -> d, Collectors.counting()));
+    
+        String border = "+-----+------------------------------+------------+----------+";
+        String titleRow = String.format("| %-58s |", "Order for Table " + table.getTableNumber());
+        String header = String.format("| %-3s | %-28s | %10s | %8s |", "#", "Dish", "Price", "Quantity");
+    
+        // Print table
+        System.out.println(border);
+        System.out.println(titleRow);
+        System.out.println(border);
+        System.out.println(header);
+        System.out.println(border);
+    
+        int index = 1;
+        for (Map.Entry<Dish, Long> entry : dishCounts.entrySet()) {
+            Dish dish = entry.getKey();
+            long quantity = entry.getValue();
+            System.out.printf("| %-3d | %-28s | %10s | %8d |%n", index++, dish.name(), String.format("€%.2f", dish.price()), quantity);
         }
-        System.out.println("=".repeat(50));
+    
+        System.out.println(border);
     }
-
+    
+    
     /**
      * Parses a string representation of an Order and returns an Order object.
      * Assumes the string is in the format: "TableNumber,WaiterName,WaiterId,Dish1,Dish2,..."
