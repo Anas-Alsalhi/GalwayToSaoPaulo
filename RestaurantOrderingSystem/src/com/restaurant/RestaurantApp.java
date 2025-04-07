@@ -38,7 +38,7 @@ public class RestaurantApp {
         System.out.println("6. German");
         System.out.println("7. Chinese");
         System.out.println("8. Russian");
-        System.out.println("9. Arabic");
+        System.out.println("9. Norwegian");
         System.out.println("10. Japanese");
         System.out.println("============================================");
         int languageChoice = scanner.nextInt();
@@ -52,7 +52,7 @@ public class RestaurantApp {
             case 6 -> Locale.GERMAN;
             case 7 -> Locale.CHINA;
             case 8 -> Locale.of("ru", "RU");
-            case 9 -> Locale.of("ar", "SA");
+            case 9 -> Locale.of("no", "NO");
             case 10 -> Locale.JAPAN;
             default -> Locale.ENGLISH;
         };
