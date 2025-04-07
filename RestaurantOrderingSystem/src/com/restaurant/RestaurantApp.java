@@ -14,6 +14,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
+import java.time.format.DateTimeParseException;
+import java.time.LocalDate;
 
 /**
  * Main application for managing the restaurant system.
@@ -36,6 +39,11 @@ public class RestaurantApp {
         System.out.println("3. French");
         System.out.println("4. Italian");
         System.out.println("5. Spanish");
+        System.out.println("6. German");
+        System.out.println("7. Chinese");
+        System.out.println("8. Russian");
+        System.out.println("9. Arabic");
+        System.out.println("10. Japanese");
         System.out.println("============================================");
         int languageChoice = scanner.nextInt();
         scanner.nextLine();
@@ -46,6 +54,11 @@ public class RestaurantApp {
             case 3 -> Locale.of("fr", "FR");
             case 4 -> Locale.of("it", "IT");
             case 5 -> Locale.of("es", "ES");
+            case 6 -> Locale.GERMAN;
+            case 7 -> Locale.CHINA;
+            case 8 -> Locale.of("ru", "RU");
+            case 9 -> Locale.of("ar", "SA");
+            case 10 -> Locale.JAPAN;
             default -> Locale.ENGLISH;
         };
 
@@ -72,7 +85,9 @@ public class RestaurantApp {
             System.out.println("4. " + messages.getString("view_history"));
             System.out.println("5. " + messages.getString("save_history"));
             System.out.println("6. " + messages.getString("load_history"));
-            System.out.println("7. " + messages.getString("exit"));
+            System.out.println("7. " + messages.getString("book_event"));
+            System.out.println("8. AI-Powered Recommendations"); // Updated position for AI recommendations
+            System.out.println("9. " + messages.getString("exit")); // Updated position for exit
             System.out.print(messages.getString("enter_choice"));
 
             int choice = -1;
@@ -102,7 +117,9 @@ public class RestaurantApp {
                     Path filePath = Paths.get(fileName);
                     orderHistory.loadFromFile(filePath);
                 }
-                case 7 -> {
+                case 7 -> bookEvent(scanner, messages);
+                case 8 -> recommendDishes(orderHistory, menu, messages); // Updated case for AI recommendations
+                case 9 -> {
                     System.out.println("\n" + messages.getString("thank_you"));
                     exit = true;
                 }
@@ -212,7 +229,7 @@ public class RestaurantApp {
         order.setFinalPrice(discountedTotal);
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", locale);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", locale);
         System.out.println(String.format("\n%s", String.format(messages.getString("order_timestamp"), now.format(formatter))));
 
         // Use CountDownLatch to simulate dish preparation
@@ -253,6 +270,84 @@ public class RestaurantApp {
         if (!orderHistory.getOrders().contains(order)) {
             orderHistory.addOrder(order);
             System.out.println("\n" + messages.getString("order_added_history")); // Added empty line
+        }
+    }
+
+    private static void bookEvent(Scanner scanner, ResourceBundle messages) {
+        System.out.println("\n" + messages.getString("event_booking_header"));
+        System.out.print(messages.getString("enter_event_name"));
+        String eventName = scanner.nextLine();
+
+        String eventDate;
+        while (true) {
+            System.out.print(messages.getString("enter_event_date"));
+            eventDate = scanner.nextLine().trim();
+            if (eventDate.isEmpty()) {
+                System.out.println(messages.getString("invalid_event_date_format"));
+                continue; // Prompt again if input is empty
+            }
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                LocalDateTime enteredDate = LocalDate.parse(eventDate, formatter).atStartOfDay();
+                if (enteredDate.isAfter(LocalDateTime.now())) {
+                    break; // Valid future date
+                } else {
+                    System.out.println(messages.getString("invalid_event_date_future") + " Please use a valid future date.");
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println(messages.getString("invalid_event_date_format"));
+            }
+        }
+
+        System.out.print(messages.getString("enter_event_time"));
+        String eventTime = scanner.nextLine();
+
+        System.out.print(messages.getString("enter_guest_count"));
+        int guestCount = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        System.out.println("\n" + messages.getString("event_booking_summary"));
+        System.out.printf(messages.getString("event_name"), eventName);
+        System.out.printf(messages.getString("event_date"), eventDate);
+        System.out.printf(messages.getString("event_time"), eventTime);
+        System.out.printf(messages.getString("guest_count"), guestCount);
+
+        System.out.println("\n" + messages.getString("event_booking_confirmation"));
+        System.out.print(messages.getString("confirm_booking")); // Ensure this is displayed only once
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (confirmation.equals("yes")) {
+            System.out.println(messages.getString("event_booking_success"));
+        } else {
+            System.out.println(messages.getString("event_booking_cancelled"));
+        }
+    }
+
+    private static void recommendDishes(OrderHistory orderHistory, Menu menu, ResourceBundle messages) {
+        System.out.println("\n" + messages.getString("ai_recommendations_header"));
+        
+        // Analyze order history to find the most frequently ordered dishes
+        var dishFrequency = orderHistory.getOrders().stream()
+            .flatMap(order -> order.getDishes().stream())
+            .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
+
+        // Sort dishes by frequency in descending order
+        var recommendedDishes = dishFrequency.entrySet().stream()
+            .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
+            .limit(3) // Recommend top 3 dishes
+            .map(entry -> menu.getAllDishes().stream()
+                .filter(dish -> dish.name().equals(entry.getKey()))
+                .findFirst().orElse(null))
+            .filter(dish -> dish != null)
+            .toList();
+
+        if (recommendedDishes.isEmpty()) {
+            System.out.println(messages.getString("no_recommendations"));
+        } else {
+            System.out.println(messages.getString("recommended_dishes"));
+            recommendedDishes.forEach(dish -> 
+                System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price())
+            );
         }
     }
 }
