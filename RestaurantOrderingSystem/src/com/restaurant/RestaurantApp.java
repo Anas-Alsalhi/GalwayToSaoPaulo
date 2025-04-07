@@ -41,8 +41,21 @@ public class RestaurantApp {
         System.out.println("9. Norwegian");
         System.out.println("10. Japanese");
         System.out.println("============================================");
-        int languageChoice = scanner.nextInt();
-        scanner.nextLine();
+
+        int languageChoice = -1;
+        while (languageChoice < 1 || languageChoice > 10) {
+            System.out.print("Please enter a number between 1 and 10: ");
+            if (scanner.hasNextInt()) {
+                languageChoice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                if (languageChoice < 1 || languageChoice > 10) {
+                    System.out.println("Invalid choice. Try again.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Consume invalid input
+            }
+        }
 
         Locale locale = switch (languageChoice) {
             case 2 -> Locale.of("pt", "PT");
