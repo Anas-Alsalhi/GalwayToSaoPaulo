@@ -18,9 +18,6 @@ import java.util.stream.Collectors;
 import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
 
-/**
- * Main application for managing the restaurant system.
- */
 public class RestaurantApp {
 
     private static final List<String> WAITER_NAMES = List.of("Sophia", "Liam", "Olivia", "Noah", "Emma");
@@ -31,7 +28,6 @@ public class RestaurantApp {
         OrderHistory orderHistory = new OrderHistory();
         boolean exit = false;
 
-        // Prompt user to select a language
         System.out.println("============================================");
         System.out.println("Select a language:");
         System.out.println("1. English");
@@ -48,7 +44,6 @@ public class RestaurantApp {
         int languageChoice = scanner.nextInt();
         scanner.nextLine();
 
-        // Set locale based on user choice
         Locale locale = switch (languageChoice) {
             case 2 -> Locale.of("pt", "PT");
             case 3 -> Locale.of("fr", "FR");
@@ -62,7 +57,6 @@ public class RestaurantApp {
             default -> Locale.ENGLISH;
         };
 
-        // Load resource bundle for localized messages
         ResourceBundle messages;
         try {
             messages = ResourceBundle.getBundle("com.restaurant.messages", locale);
@@ -86,8 +80,8 @@ public class RestaurantApp {
             System.out.println("5. " + messages.getString("save_history"));
             System.out.println("6. " + messages.getString("load_history"));
             System.out.println("7. " + messages.getString("book_event"));
-            System.out.println("8. AI-Powered Recommendations"); // Updated position for AI recommendations
-            System.out.println("9. " + messages.getString("exit")); // Updated position for exit
+            System.out.println("8. AI-Powered Recommendations");
+            System.out.println("9. " + messages.getString("exit"));
             System.out.print(messages.getString("enter_choice"));
 
             int choice = -1;
@@ -118,7 +112,7 @@ public class RestaurantApp {
                     orderHistory.loadFromFile(filePath);
                 }
                 case 7 -> bookEvent(scanner, messages);
-                case 8 -> recommendDishes(orderHistory, menu, messages); // Updated case for AI recommendations
+                case 8 -> recommendDishes(orderHistory, menu, messages);
                 case 9 -> {
                     System.out.println("\n" + messages.getString("thank_you"));
                     exit = true;
@@ -141,7 +135,7 @@ public class RestaurantApp {
         Table table = tables.get(random.nextInt(tables.size()));
         int seatedCustomers = random.nextInt(table.getCapacity()) + 1;
         String waiterName = WAITER_NAMES.get(random.nextInt(WAITER_NAMES.size()));
-        int waiterId = random.nextInt(1000); // Generate a random waiter ID
+        int waiterId = random.nextInt(1000);
         Waiter waiter = new Waiter(waiterName, waiterId);
 
         Order order = new Order(table, waiter);
@@ -165,7 +159,7 @@ public class RestaurantApp {
                 scanner.nextLine();
                 if (choice < 0) {
                     System.out.println(messages.getString("invalid_number"));
-                    continue; // Reject negative numbers
+                    continue;
                 }
                 if (choice == 0) break;
                 if (choice > 0 && choice <= allDishes.size()) {
@@ -207,13 +201,13 @@ public class RestaurantApp {
             String discountInput = scanner.nextLine().trim();
 
             if (discountInput.isEmpty()) {
-                break; // No discount
+                break;
             }
 
             try {
                 discount = Double.parseDouble(discountInput);
                 if (discount >= 0 && discount <= 25) {
-                    break; // Valid discount
+                    break;
                 } else {
                     System.out.println(messages.getString("invalid_discount_range"));
                 }
@@ -232,14 +226,13 @@ public class RestaurantApp {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", locale);
         System.out.println(String.format("\n%s", String.format(messages.getString("order_timestamp"), now.format(formatter))));
 
-        // Use CountDownLatch to simulate dish preparation
         CountDownLatch latch = new CountDownLatch(order.getDishes().size());
         try (ExecutorService executor = Executors.newFixedThreadPool(3)) {
             for (Dish dish : order.getDishes()) {
                 executor.submit(() -> {
                     try {
                         System.out.printf(messages.getString("preparing_dish"), dish.name());
-                        Thread.sleep(1000 + random.nextInt(2000)); // Simulate preparation time
+                        Thread.sleep(1000 + random.nextInt(2000));
                         System.out.printf(messages.getString("prepared_dish"), dish.name());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
@@ -249,8 +242,8 @@ public class RestaurantApp {
                 });
             }
 
-            latch.await(); // Wait for all dishes to be prepared
-            System.out.println("\n" + messages.getString("all_dishes_prepared")); // Added empty line
+            latch.await();
+            System.out.println("\n" + messages.getString("all_dishes_prepared"));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println(messages.getString("preparation_interrupted"));
@@ -262,14 +255,14 @@ public class RestaurantApp {
                 return messages.getString("order_processed");
             });
 
-            System.out.println("\n" + processingTask.get()); // Added empty line
+            System.out.println("\n" + processingTask.get());
         } catch (Exception e) {
             System.err.println(messages.getString("order_failed") + ": " + e.getMessage());
         }
 
         if (!orderHistory.getOrders().contains(order)) {
             orderHistory.addOrder(order);
-            System.out.println("\n" + messages.getString("order_added_history")); // Added empty line
+            System.out.println("\n" + messages.getString("order_added_history"));
         }
     }
 
@@ -284,15 +277,15 @@ public class RestaurantApp {
             eventDate = scanner.nextLine().trim();
             if (eventDate.isEmpty()) {
                 System.out.println(messages.getString("invalid_event_date_format"));
-                continue; // Prompt again if input is empty
+                continue;
             }
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 LocalDateTime enteredDate = LocalDate.parse(eventDate, formatter).atStartOfDay();
                 if (enteredDate.isAfter(LocalDateTime.now())) {
-                    break; // Valid future date
+                    break;
                 } else {
-                    System.out.println(messages.getString("invalid_event_date_future") + " Please use a valid future date.");
+                    System.out.println(messages.getString("invalid_event_date_future"));
                 }
             } catch (DateTimeParseException e) {
                 System.out.println(messages.getString("invalid_event_date_format"));
@@ -304,7 +297,7 @@ public class RestaurantApp {
 
         System.out.print(messages.getString("enter_guest_count"));
         int guestCount = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         System.out.println("\n" + messages.getString("event_booking_summary"));
         System.out.printf(messages.getString("event_name"), eventName);
@@ -312,8 +305,7 @@ public class RestaurantApp {
         System.out.printf(messages.getString("event_time"), eventTime);
         System.out.printf(messages.getString("guest_count"), guestCount);
 
-        System.out.println("\n" + messages.getString("event_booking_confirmation"));
-        System.out.print(messages.getString("confirm_booking")); // Ensure this is displayed only once
+        System.out.print("\n" + messages.getString("confirm_booking")); // Confirmation prompt (only once)
         String confirmation = scanner.nextLine().trim().toLowerCase();
 
         if (confirmation.equals("yes")) {
@@ -325,16 +317,14 @@ public class RestaurantApp {
 
     private static void recommendDishes(OrderHistory orderHistory, Menu menu, ResourceBundle messages) {
         System.out.println("\n" + messages.getString("ai_recommendations_header"));
-        
-        // Analyze order history to find the most frequently ordered dishes
+
         var dishFrequency = orderHistory.getOrders().stream()
             .flatMap(order -> order.getDishes().stream())
             .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
 
-        // Sort dishes by frequency in descending order
         var recommendedDishes = dishFrequency.entrySet().stream()
             .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
-            .limit(3) // Recommend top 3 dishes
+            .limit(3)
             .map(entry -> menu.getAllDishes().stream()
                 .filter(dish -> dish.name().equals(entry.getKey()))
                 .findFirst().orElse(null))
@@ -345,10 +335,9 @@ public class RestaurantApp {
             System.out.println(messages.getString("no_recommendations"));
         } else {
             System.out.println(messages.getString("recommended_dishes"));
-            recommendedDishes.forEach(dish -> 
+            recommendedDishes.forEach(dish ->
                 System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price())
             );
         }
     }
 }
-
