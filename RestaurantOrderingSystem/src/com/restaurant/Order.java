@@ -126,7 +126,8 @@ public class Order implements Serializable {
         String waiterName = parts[1];
         int waiterId = Integer.parseInt(parts[2]);
 
-        Table table = new Table(tableNumber, 4); // Default capacity
+        // Example: Fetch table capacity dynamically if possible
+        Table table = new Table(tableNumber, 4); // Replace with a lookup or configuration
         Waiter waiter = new Waiter(waiterName, waiterId);
         Order order = new Order(table, waiter);
 
@@ -141,7 +142,7 @@ public class Order implements Serializable {
                           failedDishes.add(dish.name());
                       }
                   },
-                  () -> System.err.println("Dish not found in the menu.")
+                  () -> failedDishes.add("Unknown Dish")
               ));
 
         if (!failedDishes.isEmpty()) {

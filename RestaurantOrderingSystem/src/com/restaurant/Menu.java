@@ -128,8 +128,8 @@ public class Menu {
      * @return An Optional containing the Dish object if found, otherwise an empty Optional.
      */
     public static Optional<Dish> findDishByName(String name) {
-        return new Menu().getAllDishes().stream()
-                         .filter(dish -> dish.name().equalsIgnoreCase(name))
-                         .findFirst();
+        return dishes.stream()
+                     .filter(dish -> dish.name().equalsIgnoreCase(name))
+                     .findFirst();
     }
 }

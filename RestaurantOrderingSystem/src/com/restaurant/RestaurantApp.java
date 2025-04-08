@@ -2,25 +2,15 @@ package com.restaurant;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.Random;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.MissingResourceException;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
-import java.time.format.DateTimeParseException;
-import java.time.LocalDate;
+import java.util.*;
+import java.util.concurrent.*;
+import java.time.*;
+import java.time.format.*;
 
 public class RestaurantApp {
 
     private static final List<String> WAITER_NAMES = List.of("Sophia", "Liam", "Olivia", "Noah", "Emma");
+    private static final int LANGUAGE_COUNT = 10; // Number of supported languages
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -28,6 +18,40 @@ public class RestaurantApp {
         OrderHistory orderHistory = new OrderHistory();
         boolean exit = false;
 
+        printLanguageSelectionMenu();
+
+        int languageChoice = getValidLanguageChoice(scanner);
+        Locale locale = getLocaleForLanguageChoice(languageChoice);
+
+        ResourceBundle messages = loadResourceBundle(locale);
+
+        printWelcomeMessage(messages);
+
+        while (!exit) {
+            printMainMenu(messages);
+            int choice = getValidMenuChoice(scanner, messages);
+
+            switch (choice) {
+                case 1 -> menu.displayMenuByCategory(messages);
+                case 2 -> menu.displayDailySpecials();
+                case 3 -> processOrder(menu, scanner, orderHistory, messages, locale);
+                case 4 -> orderHistory.displayHistory();
+                case 5 -> saveOrderHistory(scanner, orderHistory, messages);
+                case 6 -> loadOrderHistory(scanner, orderHistory, messages);
+                case 7 -> bookEvent(scanner, messages);
+                case 8 -> recommendDishes(orderHistory, menu, messages);
+                case 9 -> {
+                    System.out.println("\n" + messages.getString("thank_you"));
+                    exit = true;
+                }
+                default -> System.out.println(messages.getString("invalid_choice"));
+            }
+        }
+
+        System.out.println(messages.getString("goodbye"));
+    }
+
+    private static void printLanguageSelectionMenu() {
         System.out.println("============================================");
         System.out.println("Select a language:");
         System.out.println("1. English");
@@ -41,14 +65,16 @@ public class RestaurantApp {
         System.out.println("9. Norwegian");
         System.out.println("10. Japanese");
         System.out.println("============================================");
+    }
 
+    private static int getValidLanguageChoice(Scanner scanner) {
         int languageChoice = -1;
-        while (languageChoice < 1 || languageChoice > 10) {
-            System.out.print("Please enter a number between 1 and 10: ");
+        while (languageChoice < 1 || languageChoice > LANGUAGE_COUNT) {
+            System.out.print("Please enter a number between 1 and " + LANGUAGE_COUNT + ": ");
             if (scanner.hasNextInt()) {
                 languageChoice = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
-                if (languageChoice < 1 || languageChoice > 10) {
+                if (languageChoice < 1 || languageChoice > LANGUAGE_COUNT) {
                     System.out.println("Invalid choice. Try again.");
                 }
             } else {
@@ -56,85 +82,80 @@ public class RestaurantApp {
                 scanner.nextLine(); // Consume invalid input
             }
         }
+        return languageChoice;
+    }
 
-        Locale locale = switch (languageChoice) {
-            case 2 -> Locale.of("pt", "PT");
-            case 3 -> Locale.of("fr", "FR");
-            case 4 -> Locale.of("it", "IT");
-            case 5 -> Locale.of("es", "ES");
-            case 6 -> Locale.GERMAN;
-            case 7 -> Locale.CHINA;
-            case 8 -> Locale.of("ru", "RU");
-            case 9 -> Locale.of("no", "NO");
-            case 10 -> Locale.JAPAN;
-            default -> Locale.ENGLISH;
-        };
+    private static Locale getLocaleForLanguageChoice(int languageChoice) {
+        Map<Integer, Locale> localeMap = Map.of(
+            1, Locale.ENGLISH,
+            2, Locale.of("pt", "PT"),
+            3, Locale.of("fr", "FR"),
+            4, Locale.of("it", "IT"),
+            5, Locale.of("es", "ES"),
+            6, Locale.GERMAN,
+            7, Locale.CHINA,
+            8, Locale.of("ru", "RU"),
+            9, Locale.of("no", "NO"),
+            10, Locale.JAPAN
+        );
+        return localeMap.getOrDefault(languageChoice, Locale.ENGLISH);
+    }
 
-        ResourceBundle messages;
+    private static ResourceBundle loadResourceBundle(Locale locale) {
         try {
-            messages = ResourceBundle.getBundle("com.restaurant.messages", locale);
+            return ResourceBundle.getBundle("com.restaurant.messages", locale);
         } catch (MissingResourceException e) {
             System.err.println("Missing resource bundle for locale: " + locale + ". Falling back to English.");
-            messages = ResourceBundle.getBundle("com.restaurant.messages", Locale.ENGLISH);
+            return ResourceBundle.getBundle("com.restaurant.messages", Locale.ENGLISH);
         }
+    }
 
+    private static void printWelcomeMessage(ResourceBundle messages) {
         System.out.println();
         System.out.println("============================================");
         System.out.println(messages.getString("welcome").replace("Sabor Brasileiro", "Galway To São Paulo Restaurant"));
         System.out.println(messages.getString("tagline"));
         System.out.println("============================================\n");
+    }
 
-        while (!exit) {
-            System.out.println("\n" + messages.getString("choose_option"));
-            System.out.println("1. " + messages.getString("view_menu"));
-            System.out.println("2. " + messages.getString("view_specials"));
-            System.out.println("3. " + messages.getString("place_order"));
-            System.out.println("4. " + messages.getString("view_history"));
-            System.out.println("5. " + messages.getString("save_history"));
-            System.out.println("6. " + messages.getString("load_history"));
-            System.out.println("7. " + messages.getString("book_event"));
-            System.out.println("8. AI-Powered Recommendations");
-            System.out.println("9. " + messages.getString("exit"));
-            System.out.print(messages.getString("enter_choice"));
+    private static void printMainMenu(ResourceBundle messages) {
+        System.out.println("\n" + messages.getString("choose_option"));
+        System.out.println("1. " + messages.getString("view_menu"));
+        System.out.println("2. " + messages.getString("view_specials"));
+        System.out.println("3. " + messages.getString("place_order"));
+        System.out.println("4. " + messages.getString("view_history"));
+        System.out.println("5. " + messages.getString("save_history"));
+        System.out.println("6. " + messages.getString("load_history"));
+        System.out.println("7. " + messages.getString("book_event"));
+        System.out.println("8. AI-Powered Recommendations");
+        System.out.println("9. " + messages.getString("exit"));
+        System.out.print(messages.getString("enter_choice"));
+    }
 
-            int choice = -1;
-            if (scanner.hasNextInt()) {
-                choice = scanner.nextInt();
-                scanner.nextLine();
-            } else {
-                System.out.println(messages.getString("invalid_input"));
-                scanner.nextLine();
-                continue;
-            }
-
-            switch (choice) {
-                case 1 -> menu.displayMenuByCategory(messages);
-                case 2 -> menu.displayDailySpecials();
-                case 3 -> processOrder(menu, scanner, orderHistory, messages, locale);
-                case 4 -> orderHistory.displayHistory();
-                case 5 -> {
-                    System.out.print(messages.getString("enter_file_save"));
-                    String fileName = scanner.nextLine();
-                    Path filePath = Paths.get(fileName);
-                    orderHistory.saveToFile(filePath);
-                }
-                case 6 -> {
-                    System.out.print(messages.getString("enter_file_load"));
-                    String fileName = scanner.nextLine();
-                    Path filePath = Paths.get(fileName);
-                    orderHistory.loadFromFile(filePath);
-                }
-                case 7 -> bookEvent(scanner, messages);
-                case 8 -> recommendDishes(orderHistory, menu, messages);
-                case 9 -> {
-                    System.out.println("\n" + messages.getString("thank_you"));
-                    exit = true;
-                }
-                default -> System.out.println(messages.getString("invalid_choice"));
-            }
+    private static int getValidMenuChoice(Scanner scanner, ResourceBundle messages) {
+        int choice = -1;
+        if (scanner.hasNextInt()) {
+            choice = scanner.nextInt();
+            scanner.nextLine();
+        } else {
+            System.out.println(messages.getString("invalid_input"));
+            scanner.nextLine();
         }
+        return choice;
+    }
 
-        System.out.println(messages.getString("goodbye"));
+    private static void saveOrderHistory(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
+        System.out.print(messages.getString("enter_file_save"));
+        String fileName = scanner.nextLine();
+        Path filePath = Paths.get(fileName);
+        orderHistory.saveToFile(filePath);
+    }
+
+    private static void loadOrderHistory(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
+        System.out.print(messages.getString("enter_file_load"));
+        String fileName = scanner.nextLine();
+        Path filePath = Paths.get(fileName);
+        orderHistory.loadFromFile(filePath);
     }
 
     private static void processOrder(Menu menu, Scanner scanner, OrderHistory orderHistory, ResourceBundle messages, Locale locale) {
@@ -293,7 +314,11 @@ public class RestaurantApp {
                 continue;
             }
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
+                // Add a fallback formatter for locales with different date formats
+                if (Locale.getDefault().getLanguage().equals("es")) {
+                    formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
+                }
                 LocalDateTime enteredDate = LocalDate.parse(eventDate, formatter).atStartOfDay();
                 if (enteredDate.isAfter(LocalDateTime.now())) {
                     break;
