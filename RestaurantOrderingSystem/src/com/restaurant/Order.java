@@ -113,10 +113,11 @@ public class Order implements Serializable {
      * Assumes the string is in the format: "TableNumber,WaiterName,WaiterId,Dish1,Dish2,..."
      *
      * @param orderString The string representation of the order.
+     * @param menu The menu instance to use for finding dishes.
      * @return The parsed Order object.
      * @throws IllegalArgumentException If the string format is invalid.
      */
-    public static Order parse(String orderString) {
+    public static Order parse(String orderString, Menu menu) {
         String[] parts = orderString.split(",");
         if (parts.length < 3) {
             throw new IllegalArgumentException("Invalid order string format.");
@@ -133,7 +134,7 @@ public class Order implements Serializable {
 
         List<String> failedDishes = new ArrayList<>();
         Arrays.stream(parts, 3, parts.length)
-              .map(Menu::findDishByName)
+              .map(menu::findDishByName) // Use the menu instance
               .forEach(optionalDish -> optionalDish.ifPresentOrElse(
                   dish -> {
                       try {

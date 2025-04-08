@@ -85,7 +85,8 @@ public class OrderHistory {
             String line;
             while ((line = reader.readLine()) != null) {
                 try {
-                    orders.add(Order.parse(line)); // Ensure Order.parse is implemented correctly
+                    Menu menu = getMenu(); // Replace with the actual method or logic to retrieve the Menu object
+                    orders.add(Order.parse(line, menu)); // Ensure Order.parse is implemented correctly
                 } catch (IllegalArgumentException e) {
                     System.err.println("Failed to parse order: " + e.getMessage());
                 }
@@ -179,5 +180,15 @@ public class OrderHistory {
             }
         }
         return discount;
+    }
+
+    /**
+     * Retrieves the menu instance.
+     * This is a placeholder method and should be replaced with the actual logic to retrieve the Menu object.
+     *
+     * @return A new Menu instance.
+     */
+    private Menu getMenu() {
+        return new Menu(); // Replace with actual logic to retrieve the Menu instance
     }
 }

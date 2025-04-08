@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 import java.time.*;
 import java.time.format.*;
 
@@ -360,14 +361,14 @@ public class RestaurantApp {
             .flatMap(order -> order.getDishes().stream())
             .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
 
-        var recommendedDishes = dishFrequency.entrySet().stream()
+        List<Dish> recommendedDishes = dishFrequency.entrySet().stream()
             .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
             .limit(3)
-            .map(entry -> menu.getAllDishes().stream()
+            .map(entry -> menu.getAllDishes().stream() // Use menu instance to access dishes
                 .filter(dish -> dish.name().equals(entry.getKey()))
                 .findFirst().orElse(null))
             .filter(dish -> dish != null)
-            .toList();
+            .collect(Collectors.toList());
 
         if (recommendedDishes.isEmpty()) {
             System.out.println(messages.getString("no_recommendations"));
