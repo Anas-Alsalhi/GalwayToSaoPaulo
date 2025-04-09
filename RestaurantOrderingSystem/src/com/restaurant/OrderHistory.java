@@ -123,6 +123,8 @@ public class OrderHistory {
     private String getDateFormatForLocale(Locale locale) {
         if (locale.getLanguage().equals("es")) {
             return "dd-MM-yyyy"; // Spanish uses dashes
+        } else if (locale.getLanguage().equals("ja")) {
+            return "yyyy/MM/dd"; // Japanese uses slashes with year first
         }
         return "dd/MM/yyyy"; // Default format
     }
