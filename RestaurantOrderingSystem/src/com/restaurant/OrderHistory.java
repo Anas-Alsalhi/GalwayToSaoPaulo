@@ -114,7 +114,20 @@ public class OrderHistory {
         System.out.println("Relativized Path: " + relativizedPath);
     }
 
-    // Display order summary with better formatting
+    /**
+     * Dynamically determines the date format based on the locale.
+     *
+     * @param locale The locale to determine the date format for.
+     * @return The appropriate date format string.
+     */
+    private String getDateFormatForLocale(Locale locale) {
+        if (locale.getLanguage().equals("es")) {
+            return "dd-MM-yyyy"; // Spanish uses dashes
+        }
+        return "dd/MM/yyyy"; // Default format
+    }
+
+    // Updated displayOrderSummary to use dynamic date format
     public void displayOrderSummary(Order order, ResourceBundle messages, Locale locale) {
         System.out.println("\n" + "=".repeat(40));
         System.out.println(" " + messages.getString("order_summary"));
@@ -148,7 +161,8 @@ public class OrderHistory {
         order.setFinalPrice(discountedTotal);
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", locale);
+        String dateFormat = getDateFormatForLocale(locale);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat + " HH:mm", locale);
         System.out.printf("  %s: %s%n", messages.getString("order_timestamp"), now.format(formatter));
         System.out.println();
 
