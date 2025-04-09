@@ -128,7 +128,7 @@ public class RestaurantApp {
         System.out.println("5. " + messages.getString("save_history"));
         System.out.println("6. " + messages.getString("load_history"));
         System.out.println("7. " + messages.getString("book_event"));
-        System.out.println("8. AI-Powered Recommendations");
+        System.out.println("8. " + messages.getString("ai_recommendations_header")); // Use localized string
         System.out.println("9. " + messages.getString("exit"));
         System.out.print(messages.getString("enter_choice"));
     }
