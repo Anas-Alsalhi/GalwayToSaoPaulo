@@ -344,10 +344,11 @@ public class RestaurantApp {
         System.out.printf(messages.getString("event_time"), eventTime);
         System.out.printf(messages.getString("guest_count"), guestCount);
 
-        System.out.print("\n" + messages.getString("confirm_booking")); // Confirmation prompt (only once)
+        System.out.print("\n" + messages.getString("confirm_booking"));
         String confirmation = scanner.nextLine().trim().toLowerCase();
 
-        if (confirmation.equals("yes")) {
+        String yesLocalized = messages.getString("yes").toLowerCase(); // Add localized "yes"
+        if (confirmation.equals(yesLocalized)) {
             System.out.println(messages.getString("event_booking_success"));
         } else {
             System.out.println(messages.getString("event_booking_cancelled"));
