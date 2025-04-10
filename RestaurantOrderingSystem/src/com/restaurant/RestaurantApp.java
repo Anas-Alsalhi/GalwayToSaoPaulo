@@ -128,7 +128,7 @@ public class RestaurantApp {
         System.out.println("5. " + messages.getString("save_history"));
         System.out.println("6. " + messages.getString("load_history"));
         System.out.println("7. " + messages.getString("book_event"));
-        System.out.println("8. " + messages.getString("ai_recommendations_header")); // Use localized string
+        System.out.println("8. " + messages.getString("ai_recommendations_header"));
         System.out.println("9. " + messages.getString("exit"));
         System.out.print(messages.getString("enter_choice"));
     }
@@ -356,7 +356,7 @@ public class RestaurantApp {
     }
 
     private static void recommendDishes(OrderHistory orderHistory, Menu menu, ResourceBundle messages) {
-        System.out.println("\n" + messages.getString("ai_recommendations_header"));
+        System.out.println("\n" + messages.getString("ai_recommendations_header").replace("IA", "AI"));
 
         var dishFrequency = orderHistory.getOrders().stream()
             .flatMap(order -> order.getDishes().stream())
