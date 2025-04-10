@@ -10,51 +10,73 @@ import java.time.format.*;
 
 public class RestaurantApp {
 
+    // List of waiter names used for assigning random waiters to tables
     private static final List<String> WAITER_NAMES = List.of("Sophia", "Liam", "Olivia", "Noah", "Emma");
-    private static final int LANGUAGE_COUNT = 10; // Number of supported languages
+
+    // Number of supported languages for the application
+    private static final int LANGUAGE_COUNT = 10;
 
     public static void main(String[] args) {
+        // Scanner is used to read user input from the console
         Scanner scanner = new Scanner(System.in);
-        Menu menu = new Menu();
-        OrderHistory orderHistory = new OrderHistory();
-        boolean exit = false;
 
+        // Menu object represents the restaurant's menu
+        Menu menu = new Menu();
+
+        // OrderHistory object manages the history of all orders
+        OrderHistory orderHistory = new OrderHistory();
+
+        boolean exit = false; // Flag to control the main loop
+
+        // Display the language selection menu to the user
         printLanguageSelectionMenu();
 
+        // Get the user's choice of language and set the corresponding locale
         int languageChoice = getValidLanguageChoice(scanner);
         Locale locale = getLocaleForLanguageChoice(languageChoice);
 
+        // Load the appropriate resource bundle for the selected language
         ResourceBundle messages = loadResourceBundle(locale);
 
+        // Display a welcome message in the selected language
         printWelcomeMessage(messages);
 
+        // Main loop for the application
         while (!exit) {
+            // Display the main menu options
             printMainMenu(messages);
+
+            // Get the user's choice from the main menu
             int choice = getValidMenuChoice(scanner, messages);
 
+            // Handle the user's choice using a switch statement
             switch (choice) {
-                case 1 -> menu.displayMenuByCategory(messages);
-                case 2 -> menu.displayDailySpecials();
-                case 3 -> processOrder(menu, scanner, orderHistory, messages, locale);
-                case 4 -> orderHistory.displayHistory();
-                case 5 -> saveOrderHistory(scanner, orderHistory, messages);
-                case 6 -> loadOrderHistory(scanner, orderHistory, messages);
-                case 7 -> bookEvent(scanner, messages);
-                case 8 -> recommendDishes(orderHistory, menu, messages);
+                case 1 -> menu.displayMenuByCategory(messages); // Display the menu categorized by dish type
+                case 2 -> menu.displayDailySpecials(); // Show today's specials
+                case 3 -> processOrder(menu, scanner, orderHistory, messages, locale); // Process a new order
+                case 4 -> orderHistory.displayHistory(); // Display the order history
+                case 5 -> saveOrderHistory(scanner, orderHistory, messages); // Save order history to a file
+                case 6 -> loadOrderHistory(scanner, orderHistory, messages); // Load order history from a file
+                case 7 -> bookEvent(scanner, messages); // Book an event
+                case 8 -> recommendDishes(orderHistory, menu, messages); // Show AI-powered dish recommendations
                 case 9 -> {
+                    // Exit the application
                     System.out.println("\n" + messages.getString("thank_you"));
                     exit = true;
                 }
-                default -> System.out.println(messages.getString("invalid_choice"));
+                default -> System.out.println(messages.getString("invalid_choice")); // Handle invalid menu choices
             }
         }
 
+        // Display a goodbye message before exiting
         System.out.println(messages.getString("goodbye"));
     }
 
+    // Method to display the language selection menu
     private static void printLanguageSelectionMenu() {
         System.out.println("============================================");
         System.out.println("Select a language:");
+        // List of supported languages
         System.out.println("1. English");
         System.out.println("2. Portuguese");
         System.out.println("3. French");
@@ -68,6 +90,7 @@ public class RestaurantApp {
         System.out.println("============================================");
     }
 
+    // Method to get a valid language choice from the user
     private static int getValidLanguageChoice(Scanner scanner) {
         int languageChoice = -1;
         while (languageChoice < 1 || languageChoice > LANGUAGE_COUNT) {
@@ -86,6 +109,7 @@ public class RestaurantApp {
         return languageChoice;
     }
 
+    // Method to map the user's language choice to a Locale object
     private static Locale getLocaleForLanguageChoice(int languageChoice) {
         Map<Integer, Locale> localeMap = Map.of(
             1, Locale.ENGLISH,
@@ -102,6 +126,7 @@ public class RestaurantApp {
         return localeMap.getOrDefault(languageChoice, Locale.ENGLISH);
     }
 
+    // Method to load the appropriate resource bundle for the selected language
     private static ResourceBundle loadResourceBundle(Locale locale) {
         try {
             return ResourceBundle.getBundle("com.restaurant.messages", locale);
@@ -111,6 +136,7 @@ public class RestaurantApp {
         }
     }
 
+    // Method to display a welcome message in the selected language
     private static void printWelcomeMessage(ResourceBundle messages) {
         System.out.println();
         System.out.println("============================================");
@@ -119,6 +145,7 @@ public class RestaurantApp {
         System.out.println("============================================\n");
     }
 
+    // Method to display the main menu options
     private static void printMainMenu(ResourceBundle messages) {
         System.out.println("\n" + messages.getString("choose_option"));
         System.out.println("1. " + messages.getString("view_menu"));
@@ -133,6 +160,7 @@ public class RestaurantApp {
         System.out.print(messages.getString("enter_choice"));
     }
 
+    // Method to get a valid menu choice from the user
     private static int getValidMenuChoice(Scanner scanner, ResourceBundle messages) {
         int choice = -1;
         if (scanner.hasNextInt()) {
@@ -145,6 +173,7 @@ public class RestaurantApp {
         return choice;
     }
 
+    // Method to save the order history to a file
     private static void saveOrderHistory(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
         System.out.print(messages.getString("enter_file_save"));
         String fileName = scanner.nextLine();
@@ -152,6 +181,7 @@ public class RestaurantApp {
         orderHistory.saveToFile(filePath);
     }
 
+    // Method to load the order history from a file
     private static void loadOrderHistory(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
         System.out.print(messages.getString("enter_file_load"));
         String fileName = scanner.nextLine();
@@ -159,6 +189,7 @@ public class RestaurantApp {
         orderHistory.loadFromFile(filePath);
     }
 
+    // Method to process a new order
     private static void processOrder(Menu menu, Scanner scanner, OrderHistory orderHistory, ResourceBundle messages, Locale locale) {
         List<Table> tables = List.of(
                 new Table(1, 2),
@@ -301,6 +332,7 @@ public class RestaurantApp {
         }
     }
 
+    // Method to book an event
     private static void bookEvent(Scanner scanner, ResourceBundle messages) {
         System.out.println("\n" + messages.getString("event_booking_header"));
         System.out.print(messages.getString("enter_event_name"));
@@ -355,6 +387,7 @@ public class RestaurantApp {
         }
     }
 
+    // Method to recommend dishes based on order history
     private static void recommendDishes(OrderHistory orderHistory, Menu menu, ResourceBundle messages) {
         System.out.println("\n" + messages.getString("ai_recommendations_header").replace("IA", "AI"));
 
