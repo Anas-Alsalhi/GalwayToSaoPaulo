@@ -4,12 +4,13 @@ import java.io.Serializable;
 
 /**
  * Represents a staff member in the restaurant.
+ * This is an abstract class that serves as a base for specific staff roles.
  */
 public abstract class Staff implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    private String name; // Name of the staff member
 
     /**
      * Default constructor for deserialization.

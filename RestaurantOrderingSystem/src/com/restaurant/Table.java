@@ -5,13 +5,14 @@ import java.util.Objects;
 
 /**
  * Represents a table in the restaurant.
+ * Each table has a unique number and a seating capacity.
  */
 public class Table implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final int tableNumber;
-    private final int capacity;
+    private final int tableNumber; // Unique table number
+    private final int capacity; // Number of seats at the table
 
     /**
      * Constructor for creating a Table.
@@ -24,10 +25,20 @@ public class Table implements Serializable {
         this.capacity = capacity;
     }
 
+    /**
+     * Gets the table number.
+     *
+     * @return The table number.
+     */
     public int getTableNumber() {
         return tableNumber;
     }
 
+    /**
+     * Gets the seating capacity of the table.
+     *
+     * @return The seating capacity.
+     */
     public int getCapacity() {
         return capacity;
     }
