@@ -168,8 +168,8 @@ public class RestaurantApp {
         System.out.println("6. " + messages.getString("load_history")); 
         System.out.println("7. " + messages.getString("book_event")); 
         System.out.println("8. " + messages.getString("ai_recommendations_header")); 
-        System.out.println("9. Save Order History as Text");
-        System.out.println("10. Load Order History from Text");
+        System.out.println("9. " + messages.getString("save_as_text"));
+        System.out.println("10. " + messages.getString("load_as_text"));
         System.out.println("11. " + messages.getString("exit")); 
         System.out.print(messages.getString("enter_choice"));
     }
