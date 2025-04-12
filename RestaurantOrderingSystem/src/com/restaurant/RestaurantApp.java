@@ -305,7 +305,7 @@ public class RestaurantApp {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", locale);
         String formattedTimestamp = dateFormat.format(new Date());
-        System.out.println("\n" + messages.getString("order_timestamp") + " " + formattedTimestamp);
+        System.out.printf(messages.getString("order_timestamp").replace(" (dd/MM/yyyy HH:mm)", "") + "%n", formattedTimestamp);
 
         Map<String, Long> dishCounts = order.getDishes().stream()
             .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
