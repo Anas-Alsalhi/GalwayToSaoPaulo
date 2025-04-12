@@ -421,7 +421,7 @@ public class RestaurantApp {
                 writer.write(messages.getString("order_added_history") + "\n");
             }
 
-            System.out.println("Order summary saved to: " + orderFile.toAbsolutePath());
+            System.out.println(messages.getString("order_summary_saved") + ": " + orderFile.toAbsolutePath());
         } catch (IOException e) {
             System.err.println("Failed to save order summary: " + e.getMessage());
         }

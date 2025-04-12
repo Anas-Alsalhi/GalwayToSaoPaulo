@@ -7,18 +7,20 @@ The Restaurant Ordering System is a console-based application designed to stream
 - Multi-language Support: The application supports 10 languages, including English, Portuguese, French, Italian, Spanish, German, Chinese, Russian, Norwegian, and Japanese.
 - Menu Management: View the restaurant's menu categorized by dish type (Appetizers, Main Courses, Desserts, Beverages).
 - Daily Specials: Display a selection of daily specials chosen randomly from the menu.
-- Order Processing: Place and process orders, including applying discounts and generating order summaries.
-- Order History: Save, load, and view the history of all orders.
+- Order Processing: Place and process orders, including applying discounts, generating order summaries, and saving dish preparation logs.
+- Order History: Save, load, and view the history of all orders. History can be saved/loaded as text or binary files.
 - Event Booking: Book events with details such as event name, date, time, and guest count.
 - AI-Powered Recommendations: Get dish recommendations based on order history.
+- Error Handling: Handles invalid inputs, missing resource bundles, and other edge cases gracefully.
 
 ## How to Use
 
 1. Language Selection: Upon starting the application, select your preferred language from the list of supported languages.
 2. Main Menu: Choose from various options such as viewing the menu, placing an order, or booking an event.
-3. Order Management: Add dishes to your order, apply discounts, and finalize the order.
+3. Order Management: Add dishes to your order, apply discounts, and finalize the order. Dish preparation logs are saved in the order summary.
 4. Event Booking: Provide event details to book an event at the restaurant.
 5. Recommendations: View AI-powered dish recommendations based on past orders.
+6. Order History: Save or load order history as text or binary files.
 
 ## Technologies Used
 
