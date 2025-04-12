@@ -307,7 +307,8 @@ public class RestaurantApp {
             .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
 
         CountDownLatch latch = new CountDownLatch(dishCounts.size());
-        try (ExecutorService executor = Executors.newFixedThreadPool(3)) {
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+        try {
             for (Map.Entry<String, Long> entry : dishCounts.entrySet()) {
                 String dishName = entry.getKey();
                 long count = entry.getValue();
@@ -324,6 +325,7 @@ public class RestaurantApp {
                         System.out.printf("%s (%d)%n", preparedMessage, count); // Grouped completion
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
+                        System.err.println(messages.getString("preparation_interrupted"));
                     } finally {
                         latch.countDown();
                     }
@@ -335,10 +337,20 @@ public class RestaurantApp {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println(messages.getString("preparation_interrupted"));
+        } finally {
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
 
-        try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
-            Future<String> processingTask = executor.submit(() -> {
+        try (ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor()) {
+            Future<String> processingTask = singleThreadExecutor.submit(() -> {
                 Thread.sleep(2000);
                 return messages.getString("order_processed");
             });
@@ -376,13 +388,9 @@ public class RestaurantApp {
                 continue;
             }
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
-                // Add a fallback formatter for locales with different date formats
-                if (Locale.getDefault().getLanguage().equals("es")) {
-                    formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
-                }
-                LocalDateTime enteredDate = LocalDate.parse(eventDate, formatter).atStartOfDay();
-                if (enteredDate.isAfter(LocalDateTime.now())) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault());
+                LocalDate enteredDate = LocalDate.parse(eventDate, formatter);
+                if (enteredDate.isAfter(LocalDate.now())) {
                     break;
                 } else {
                     System.out.println(messages.getString("invalid_event_date_future"));
@@ -401,7 +409,7 @@ public class RestaurantApp {
                 continue;
             }
             try {
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault());
                 LocalTime.parse(eventTime, timeFormatter);
                 break; // Valid time format
             } catch (DateTimeParseException e) {
@@ -422,7 +430,7 @@ public class RestaurantApp {
         System.out.print("\n" + messages.getString("confirm_booking"));
         String confirmation = scanner.nextLine().trim().toLowerCase();
 
-        String yesLocalized = messages.getString("yes").toLowerCase(); // Add localized "yes"
+        String yesLocalized = messages.getString("yes").toLowerCase();
         if (confirmation.equals(yesLocalized)) {
             System.out.println(messages.getString("event_booking_success"));
         } else {
