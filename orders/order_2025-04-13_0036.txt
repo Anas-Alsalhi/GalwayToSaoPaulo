@@ -1,0 +1,17 @@
+Order Summary
+=============
+Table Number: 2
+Waiter: Sophia
+Seated Customers: 1
+
+Ordered Items:
+
+Subtotal: €0.00
+Discount: 0.00%
+Total After Discount: €0.00
+Order Timestamp: 13/04/2025 00:36
+
+Dish Preparation Logs:
+
+Order processed successfully!
+Order added to history.

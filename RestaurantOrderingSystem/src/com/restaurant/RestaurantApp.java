@@ -245,7 +245,13 @@ public class RestaurantApp {
                     System.out.println(messages.getString("invalid_number"));
                     continue;
                 }
-                if (choice == 0) break;
+                if (choice == 0) {
+                    if (order.getDishes().isEmpty()) {
+                        System.out.println(messages.getString("error") + ": " + messages.getString("no_dishes_added"));
+                        continue; // Ensure at least one dish is added
+                    }
+                    break;
+                }
                 if (choice > 0 && choice <= allDishes.size()) {
                     Dish selectedDish = allDishes.get(choice - 1);
                     if (menu.isDishAvailable(selectedDish)) {
