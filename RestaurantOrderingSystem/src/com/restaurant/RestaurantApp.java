@@ -278,7 +278,7 @@ public class RestaurantApp {
 
         double discount = 0;
         while (true) {
-            System.out.print(messages.getString("enter_discount"));
+            System.out.print(messages.getString("enter_discount").replace("(0-25)", "(0-25%)"));
             String discountInput = scanner.nextLine().trim();
 
             if (discountInput.isEmpty()) {
@@ -310,31 +310,40 @@ public class RestaurantApp {
         Map<String, Long> dishCounts = order.getDishes().stream()
             .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
 
-        CountDownLatch latch = new CountDownLatch(dishCounts.size());
+        CountDownLatch latch = new CountDownLatch(dishCounts.values().stream().mapToInt(Long::intValue).sum());
         ExecutorService executor = Executors.newFixedThreadPool(3);
         List<String> preparationLogs = Collections.synchronizedList(new ArrayList<>());
+
         try {
-            for (Map.Entry<String, Long> entry : dishCounts.entrySet()) {
-                String dishName = entry.getKey();
-                long count = entry.getValue();
-                executor.submit(() -> {
-                    try {
-                        String preparingMessage = String.format(
-                            messages.getString("preparing_dish"), dishName
-                        );
-                        preparationLogs.add(preparingMessage + " (" + count + ")");
-                        Thread.sleep(1000 + random.nextInt(2000));
-                        String preparedMessage = String.format(
-                            messages.getString("prepared_dish"), dishName
-                        );
-                        preparationLogs.add(preparedMessage + " (" + count + ")");
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        System.err.println(messages.getString("preparation_interrupted"));
-                    } finally {
-                        latch.countDown();
-                    }
-                });
+            // Maintain the order of dishes as they appear in the order
+            List<String> orderedDishNames = order.getDishes().stream()
+                .map(Dish::name)
+                .distinct()
+                .collect(Collectors.toList());
+
+            for (String dishName : orderedDishNames) {
+                long count = dishCounts.get(dishName);
+                for (int i = 1; i <= count; i++) {
+                    int instanceNumber = i;
+                    executor.submit(() -> {
+                        try {
+                            String preparingMessage = String.format(
+                                messages.getString("preparing_dish") + " (%d of %d)", dishName, instanceNumber, count
+                            );
+                            preparationLogs.add(preparingMessage);
+                            Thread.sleep(1000 + random.nextInt(2000));
+                            String preparedMessage = String.format(
+                                messages.getString("prepared_dish") + " (%d of %d)", dishName, instanceNumber, count
+                            );
+                            preparationLogs.add(preparedMessage);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            System.err.println(messages.getString("preparation_interrupted"));
+                        } finally {
+                            latch.countDown();
+                        }
+                    });
+                }
             }
 
             latch.await();
