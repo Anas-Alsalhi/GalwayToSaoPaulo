@@ -347,10 +347,10 @@ public class RestaurantApp {
                 continue;
             }
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("DD/MM/YYYY", Locale.ENGLISH);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
                 // Add a fallback formatter for locales with different date formats
                 if (Locale.getDefault().getLanguage().equals("es")) {
-                    formatter = DateTimeFormatter.ofPattern("DD-MM-YYYY", Locale.ENGLISH);
+                    formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
                 }
                 LocalDateTime enteredDate = LocalDate.parse(eventDate, formatter).atStartOfDay();
                 if (enteredDate.isAfter(LocalDateTime.now())) {
@@ -364,7 +364,21 @@ public class RestaurantApp {
         }
 
         System.out.print(messages.getString("enter_event_time"));
-        String eventTime = scanner.nextLine();
+        String eventTime;
+        while (true) {
+            eventTime = scanner.nextLine().trim();
+            if (eventTime.isEmpty()) {
+                System.out.println(messages.getString("invalid_event_time_format"));
+                continue;
+            }
+            try {
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
+                LocalTime.parse(eventTime, timeFormatter);
+                break; // Valid time format
+            } catch (DateTimeParseException e) {
+                System.out.println(messages.getString("invalid_event_time_format"));
+            }
+        }
 
         System.out.print(messages.getString("enter_guest_count"));
         int guestCount = scanner.nextInt();
