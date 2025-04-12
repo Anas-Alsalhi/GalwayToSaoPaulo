@@ -9,12 +9,15 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Scanner;
 
 /**
  * Manages the history of orders.
  */
-public class OrderHistory {
+public class OrderHistory implements Serializable {
+
+    private static final long serialVersionUID = 1L; // Added serialVersionUID
 
     private final List<Order> orders = new CopyOnWriteArrayList<>(); // Thread-safe list
 
@@ -68,51 +71,9 @@ public class OrderHistory {
         }
     }
 
-    // Saves the order history as plain text for easier readability.
-    public void saveAsText(Path filePath) {
-        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
-            for (Order order : orders) {
-                writer.write(order.toString());
-                writer.newLine();
-            }
-            System.out.println("Order history saved as text successfully.");
-        } catch (IOException e) {
-            System.err.println("Failed to save order history as text: " + e.getMessage());
-        }
-    }
-
-    // Loads the order history from a plain text file.
-    public void loadFromText(Path filePath) {
-        if (!Files.exists(filePath)) {
-            System.out.println("File does not exist: " + filePath);
-            return;
-        }
-
-        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-            orders.clear();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                try {
-                    Menu menu = getMenu(); // Replace with the actual method or logic to retrieve the Menu object
-                    orders.add(Order.parse(line, menu)); // Ensure Order.parse is implemented correctly
-                } catch (IllegalArgumentException e) {
-                    System.err.println("Failed to parse order: " + e.getMessage());
-                }
-            }
-            System.out.println("Order history loaded from text successfully.");
-        } catch (IOException e) {
-            System.err.println("Failed to load order history from text: " + e.getMessage());
-        }
-    }
-
     // Dynamically determines the date format based on the locale.
     private String getDateFormatForLocale(Locale locale) {
-        if (locale.getLanguage().equals("es")) {
-            return "dd-MM-yyyy"; // Spanish uses dashes
-        } else if (locale.getLanguage().equals("ja")) {
-            return "yyyy/MM/dd"; // Japanese uses slashes with year first
-        }
-        return "dd/MM/yyyy"; // Default format
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale).toString();
     }
 
     // Displays a summary of an order using localized messages.

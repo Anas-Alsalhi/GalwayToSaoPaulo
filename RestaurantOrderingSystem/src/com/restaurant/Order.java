@@ -124,8 +124,6 @@ public class Order implements Serializable {
      * @return The parsed Order object.
      * @throws IllegalArgumentException If the string format is invalid.
      */
-    // Parses a string representation of an order and returns an Order object.
-    // Assumes the string is in a specific format.
     public static Order parse(String orderString, Menu menu) {
         if (orderString == null || orderString.isBlank()) {
             throw new IllegalArgumentException("Order string cannot be null or empty.");
@@ -156,7 +154,7 @@ public class Order implements Serializable {
 
         List<String> failedDishes = new ArrayList<>();
         Arrays.stream(parts, 3, parts.length)
-              .map(menu::findDishByName) // Use the menu instance
+              .map(menu::findDishByName)
               .forEach(optionalDish -> optionalDish.ifPresentOrElse(
                   dish -> {
                       try {

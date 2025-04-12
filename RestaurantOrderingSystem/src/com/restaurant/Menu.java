@@ -144,4 +144,8 @@ public class Menu {
     public void refreshDailySpecials() {
         cachedSpecials = null;
     }
+
+    public void refreshSpecials() {
+        cachedSpecials = null;
+    }
 }
