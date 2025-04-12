@@ -39,6 +39,10 @@ public class OrderHistory {
 
     // Saves the order history to a binary file.
     public void saveToFile(Path filePath) {
+        if (filePath == null || Files.isDirectory(filePath)) {
+            System.err.println("Invalid file path. Please provide a valid file.");
+            return;
+        }
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             oos.writeObject(orders);
             System.out.println("Order history saved successfully.");
@@ -49,11 +53,10 @@ public class OrderHistory {
 
     // Loads the order history from a binary file.
     public void loadFromFile(Path filePath) {
-        if (!Files.exists(filePath)) {
-            System.out.println("File does not exist: " + filePath);
+        if (filePath == null || !Files.exists(filePath)) {
+            System.err.println("File does not exist: " + filePath);
             return;
         }
-
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
             @SuppressWarnings("unchecked")
             List<Order> loadedOrders = (List<Order>) ois.readObject();

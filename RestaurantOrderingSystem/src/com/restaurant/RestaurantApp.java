@@ -299,7 +299,8 @@ public class RestaurantApp {
         order.setFinalPrice(discountedTotal);
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", locale);
+        String dateFormat = getDateFormatForLocale(locale); // Dynamically determine the date format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat + " HH:mm", locale);
         System.out.println(String.format("\n%s", String.format(messages.getString("order_timestamp"), now.format(formatter))));
 
         CountDownLatch latch = new CountDownLatch(order.getDishes().size());
@@ -307,9 +308,9 @@ public class RestaurantApp {
             for (Dish dish : order.getDishes()) {
                 executor.submit(() -> {
                     try {
-                        System.out.printf(messages.getString("preparing_dish"), dish.name());
+                        System.out.printf(messages.getString("preparing_dish"), dish.name()); // Localized message
                         Thread.sleep(1000 + random.nextInt(2000));
-                        System.out.printf(messages.getString("prepared_dish"), dish.name());
+                        System.out.printf(messages.getString("prepared_dish"), dish.name()); // Localized message
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } finally {
@@ -340,6 +341,17 @@ public class RestaurantApp {
             orderHistory.addOrder(order);
             System.out.println("\n" + messages.getString("order_added_history"));
         }
+    }
+
+    // Helper method to determine the date format based on the locale.
+    // This ensures that dates are displayed in a format familiar to the user.
+    private static String getDateFormatForLocale(Locale locale) {
+        if (locale.getLanguage().equals("es")) {
+            return "dd-MM-yyyy"; // Spanish uses dashes
+        } else if (locale.getLanguage().equals("ja")) {
+            return "yyyy/MM/dd"; // Japanese uses slashes with year first
+        }
+        return "dd/MM/yyyy"; // Default format
     }
 
     // Method to book an event.
