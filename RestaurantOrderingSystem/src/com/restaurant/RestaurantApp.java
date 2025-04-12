@@ -65,6 +65,8 @@ public class RestaurantApp {
                     System.out.println("\n" + messages.getString("thank_you"));
                     exit = true;
                 }
+                case 10 -> saveOrderHistoryAsText(scanner, orderHistory, messages);
+                case 11 -> loadOrderHistoryFromText(scanner, orderHistory, messages);
                 default -> System.out.println(messages.getString("invalid_choice")); // Handle invalid menu choices.
             }
         }
@@ -163,6 +165,8 @@ public class RestaurantApp {
         System.out.println("7. " + messages.getString("book_event")); 
         System.out.println("8. " + messages.getString("ai_recommendations_header")); 
         System.out.println("9. " + messages.getString("exit")); 
+        System.out.println("10. Save Order History as Text");
+        System.out.println("11. Load Order History from Text");
         System.out.print(messages.getString("enter_choice"));
     }
 
@@ -464,5 +468,19 @@ public class RestaurantApp {
                 System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price())
             );
         }
+    }
+
+    private static void saveOrderHistoryAsText(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
+        System.out.print(messages.getString("enter_file_save"));
+        String fileName = scanner.nextLine();
+        Path filePath = Paths.get(fileName);
+        orderHistory.saveAsText(filePath);
+    }
+
+    private static void loadOrderHistoryFromText(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
+        System.out.print(messages.getString("enter_file_load"));
+        String fileName = scanner.nextLine();
+        Path filePath = Paths.get(fileName);
+        orderHistory.loadFromText(filePath);
     }
 }

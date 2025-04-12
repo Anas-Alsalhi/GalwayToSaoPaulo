@@ -71,6 +71,42 @@ public class OrderHistory implements Serializable {
         }
     }
 
+    // Saves the order history to a text file.
+    public void saveAsText(Path filePath) {
+        if (filePath == null || Files.isDirectory(filePath)) {
+            System.err.println("Invalid file path. Please provide a valid file.");
+            return;
+        }
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+            for (Order order : orders) {
+                writer.write(order.toString()); // Ensure Order has a proper toString implementation
+                writer.newLine();
+            }
+            System.out.println("Order history saved as text successfully.");
+        } catch (IOException e) {
+            System.err.println("Failed to save order history as text: " + e.getMessage());
+        }
+    }
+
+    // Loads the order history from a text file.
+    public void loadFromText(Path filePath) {
+        if (filePath == null || !Files.exists(filePath)) {
+            System.err.println("File does not exist: " + filePath);
+            return;
+        }
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            orders.clear();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Order order = Order.parse(line, getMenu()); // Ensure Order.parse supports text parsing
+                orders.add(order);
+            }
+            System.out.println("Order history loaded from text successfully.");
+        } catch (IOException | IllegalArgumentException e) {
+            System.err.println("Failed to load order history from text: " + e.getMessage());
+        }
+    }
+
     // Dynamically determines the date format based on the locale.
     private String getDateFormatForLocale(Locale locale) {
         return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale).toString();
