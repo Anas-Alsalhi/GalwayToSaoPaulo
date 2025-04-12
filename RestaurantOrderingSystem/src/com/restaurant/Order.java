@@ -127,16 +127,29 @@ public class Order implements Serializable {
     // Parses a string representation of an order and returns an Order object.
     // Assumes the string is in a specific format.
     public static Order parse(String orderString, Menu menu) {
-        String[] parts = orderString.split(",");
-        if (parts.length < 3) {
-            throw new IllegalArgumentException("Invalid order string format.");
+        if (orderString == null || orderString.isBlank()) {
+            throw new IllegalArgumentException("Order string cannot be null or empty.");
         }
 
-        int tableNumber = Integer.parseInt(parts[0]);
-        String waiterName = parts[1];
-        int waiterId = Integer.parseInt(parts[2]);
+        String[] parts = orderString.split(",");
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Invalid order string format. Expected format: 'TableNumber,WaiterName,WaiterId,Dish1,Dish2,...'");
+        }
 
-        // Example: Fetch table capacity dynamically if possible
+        int tableNumber;
+        int waiterId;
+        try {
+            tableNumber = Integer.parseInt(parts[0]);
+            waiterId = Integer.parseInt(parts[2]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Table number and waiter ID must be valid integers.", e);
+        }
+
+        String waiterName = parts[1];
+        if (waiterName.isBlank()) {
+            throw new IllegalArgumentException("Waiter name cannot be empty.");
+        }
+
         Table table = new Table(tableNumber, 4); // Replace with a lookup or configuration
         Waiter waiter = new Waiter(waiterName, waiterId);
         Order order = new Order(table, waiter);

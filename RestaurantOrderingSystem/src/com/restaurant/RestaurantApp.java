@@ -53,7 +53,7 @@ public class RestaurantApp {
             // Handle the user's choice using a switch statement.
             switch (choice) {
                 case 1 -> menu.displayMenuByCategory(messages); // Show the menu grouped by dish type.
-                case 2 -> menu.displayDailySpecials(); // Show today's special dishes.
+                case 2 -> menu.displayDailySpecials(3); // Show today's special dishes with a limit of 3.
                 case 3 -> processOrder(menu, scanner, orderHistory, messages, locale); // Allow the user to place an order.
                 case 4 -> orderHistory.displayHistory(); // Show the history of all previous orders.
                 case 5 -> saveOrderHistory(scanner, orderHistory, messages); // Save the order history to a file.
@@ -299,7 +299,7 @@ public class RestaurantApp {
         order.setFinalPrice(discountedTotal);
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("DD/MM/YYYY", locale);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", locale);
         System.out.println(String.format("\n%s", String.format(messages.getString("order_timestamp"), now.format(formatter))));
 
         CountDownLatch latch = new CountDownLatch(order.getDishes().size());

@@ -102,23 +102,6 @@ public class OrderHistory {
         }
     }
 
-    // Demonstrates path handling by resolving and normalizing paths.
-    public void demonstratePathHandling(Path basePath, String relativePath) {
-        if (relativePath.startsWith("-")) {
-            System.out.println("Invalid relative path. Negative values are not allowed.");
-            return;
-        }
-        Path resolvedPath = basePath.resolve(relativePath);
-        Path normalizedPath = resolvedPath.normalize();
-        Path relativizedPath = basePath.relativize(normalizedPath);
-
-        System.out.println("Base Path: " + basePath);
-        System.out.println("Relative Path: " + relativePath);
-        System.out.println("Resolved Path: " + resolvedPath);
-        System.out.println("Normalized Path: " + normalizedPath);
-        System.out.println("Relativized Path: " + relativizedPath);
-    }
-
     // Dynamically determines the date format based on the locale.
     private String getDateFormatForLocale(Locale locale) {
         if (locale.getLanguage().equals("es")) {

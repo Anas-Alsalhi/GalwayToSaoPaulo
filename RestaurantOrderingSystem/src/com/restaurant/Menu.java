@@ -99,10 +99,10 @@ public class Menu {
      */
     // Displays today's specials, which are randomly selected from Irish dishes.
     // The specials remain the same throughout the session.
-    public void displayDailySpecials() {
+    public void displayDailySpecials(int limit) {
         if (cachedSpecials == null) {
             Collections.shuffle(irishDishes); // Shuffle the mutable list
-            cachedSpecials = new ArrayList<>(irishDishes.stream().limit(2).toList());
+            cachedSpecials = new ArrayList<>(irishDishes.stream().limit(limit).toList());
         }
         System.out.println("\n========== TODAY'S BRAZILIAN AND IRISH SPECIALS ==========");
         cachedSpecials.forEach(dish ->
