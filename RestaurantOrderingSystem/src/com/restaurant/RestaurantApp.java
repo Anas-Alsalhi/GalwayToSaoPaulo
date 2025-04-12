@@ -301,16 +301,21 @@ public class RestaurantApp {
         LocalDateTime now = LocalDateTime.now();
         String dateFormat = getDateFormatForLocale(locale); // Dynamically determine the date format
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat + " HH:mm", locale);
-        System.out.println(String.format("\n%s", String.format(messages.getString("order_timestamp"), now.format(formatter))));
+        System.out.println(String.format("\n%s: %s", messages.getString("order_timestamp"), now.format(formatter))); // Simplified format
 
-        CountDownLatch latch = new CountDownLatch(order.getDishes().size());
+        Map<String, Long> dishCounts = order.getDishes().stream()
+            .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
+
+        CountDownLatch latch = new CountDownLatch(dishCounts.size());
         try (ExecutorService executor = Executors.newFixedThreadPool(3)) {
-            for (Dish dish : order.getDishes()) {
+            for (Map.Entry<String, Long> entry : dishCounts.entrySet()) {
+                String dishName = entry.getKey();
+                long count = entry.getValue();
                 executor.submit(() -> {
                     try {
-                        System.out.printf(messages.getString("preparing_dish"), dish.name()); // Localized message
+                        System.out.printf(messages.getString("preparing_dish") + " (%d)%n", dishName, count); // Grouped preparation
                         Thread.sleep(1000 + random.nextInt(2000));
-                        System.out.printf(messages.getString("prepared_dish"), dish.name()); // Localized message
+                        System.out.printf(messages.getString("prepared_dish") + " (%d)%n", dishName, count); // Grouped completion
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } finally {
