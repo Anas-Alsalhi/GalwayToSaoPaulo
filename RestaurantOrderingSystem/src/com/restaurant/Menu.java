@@ -140,4 +140,8 @@ public class Menu {
                      .filter(dish -> dish.name().equalsIgnoreCase(name))
                      .findFirst();
     }
+
+    public void refreshDailySpecials() {
+        cachedSpecials = null;
+    }
 }

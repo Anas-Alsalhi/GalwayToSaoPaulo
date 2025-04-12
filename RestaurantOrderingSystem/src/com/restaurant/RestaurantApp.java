@@ -357,12 +357,7 @@ public class RestaurantApp {
     // Helper method to determine the date format based on the locale.
     // This ensures that dates are displayed in a format familiar to the user.
     private static String getDateFormatForLocale(Locale locale) {
-        if (locale.getLanguage().equals("es")) {
-            return "dd-MM-yyyy"; // Spanish uses dashes
-        } else if (locale.getLanguage().equals("ja")) {
-            return "yyyy/MM/dd"; // Japanese uses slashes with year first
-        }
-        return "dd/MM/yyyy"; // Default format
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale).toString();
     }
 
     // Method to book an event.
