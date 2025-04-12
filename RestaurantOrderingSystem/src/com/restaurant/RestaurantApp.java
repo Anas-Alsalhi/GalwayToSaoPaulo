@@ -289,7 +289,7 @@ public class RestaurantApp {
         order.setFinalPrice(discountedTotal);
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", locale);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("DD/MM/YYYY", locale);
         System.out.println(String.format("\n%s", String.format(messages.getString("order_timestamp"), now.format(formatter))));
 
         CountDownLatch latch = new CountDownLatch(order.getDishes().size());
@@ -347,10 +347,10 @@ public class RestaurantApp {
                 continue;
             }
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("DD/MM/YYYY", Locale.ENGLISH);
                 // Add a fallback formatter for locales with different date formats
                 if (Locale.getDefault().getLanguage().equals("es")) {
-                    formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
+                    formatter = DateTimeFormatter.ofPattern("DD-MM-YYYY", Locale.ENGLISH);
                 }
                 LocalDateTime enteredDate = LocalDate.parse(eventDate, formatter).atStartOfDay();
                 if (enteredDate.isAfter(LocalDateTime.now())) {
