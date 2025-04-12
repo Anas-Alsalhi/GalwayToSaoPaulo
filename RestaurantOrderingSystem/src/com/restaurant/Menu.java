@@ -64,6 +64,8 @@ public class Menu {
     /**
      * Displays the menu categorized by dish type in a specific order.
      */
+    // Displays the menu categorized by dish type.
+    // Each category is displayed in a specific order.
     public void displayMenuByCategory(ResourceBundle messages) {
         Map<Dish.Category, List<Dish>> categorizedMenu = new LinkedHashMap<>();
         for (Dish.Category category : Dish.Category.values()) {
@@ -95,6 +97,8 @@ public class Menu {
      * Displays today's specials, which are chosen randomly from Irish dishes.
      * The specials remain the same throughout the session.
      */
+    // Displays today's specials, which are randomly selected from Irish dishes.
+    // The specials remain the same throughout the session.
     public void displayDailySpecials() {
         if (cachedSpecials == null) {
             Collections.shuffle(irishDishes); // Shuffle the mutable list
@@ -113,10 +117,12 @@ public class Menu {
      * @param dish The dish to check.
      * @return True if the dish is available, false otherwise.
      */
+    // Checks if a specific dish is available in the menu.
     public boolean isDishAvailable(Dish dish) {
         return dishes.contains(dish);
     }
 
+    // Retrieves all dishes in the menu as an unmodifiable list.
     public List<Dish> getAllDishes() {
         return Collections.unmodifiableList(dishes);
     }
@@ -127,6 +133,8 @@ public class Menu {
      * @param name The name of the dish.
      * @return An Optional containing the Dish object if found, otherwise an empty Optional.
      */
+    // Finds a dish by its name.
+    // Returns an Optional containing the dish if found.
     public Optional<Dish> findDishByName(String name) {
         return dishes.stream()
                      .filter(dish -> dish.name().equalsIgnoreCase(name))

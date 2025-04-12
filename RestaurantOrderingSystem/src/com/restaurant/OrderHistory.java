@@ -18,14 +18,17 @@ public class OrderHistory {
 
     private final List<Order> orders = new CopyOnWriteArrayList<>(); // Thread-safe list
 
+    // Adds a new order to the history.
     public void addOrder(Order order) {
         orders.add(order);
     }
 
+    // Retrieves a copy of the order history to prevent external modifications.
     public List<Order> getOrders() {
         return new ArrayList<>(orders); // Return a copy to avoid external modification
     }
 
+    // Displays the order history in the console.
     public void displayHistory() {
         if (orders.isEmpty()) {
             System.out.println("No orders in history.");
@@ -34,6 +37,7 @@ public class OrderHistory {
         }
     }
 
+    // Saves the order history to a binary file.
     public void saveToFile(Path filePath) {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             oos.writeObject(orders);
@@ -43,6 +47,7 @@ public class OrderHistory {
         }
     }
 
+    // Loads the order history from a binary file.
     public void loadFromFile(Path filePath) {
         if (!Files.exists(filePath)) {
             System.out.println("File does not exist: " + filePath);
@@ -60,7 +65,7 @@ public class OrderHistory {
         }
     }
 
-    // Save order history as plain text using BufferedWriter
+    // Saves the order history as plain text for easier readability.
     public void saveAsText(Path filePath) {
         try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
             for (Order order : orders) {
@@ -73,7 +78,7 @@ public class OrderHistory {
         }
     }
 
-    // Load order history from plain text using BufferedReader
+    // Loads the order history from a plain text file.
     public void loadFromText(Path filePath) {
         if (!Files.exists(filePath)) {
             System.out.println("File does not exist: " + filePath);
@@ -97,7 +102,7 @@ public class OrderHistory {
         }
     }
 
-    // Demonstrate path handling
+    // Demonstrates path handling by resolving and normalizing paths.
     public void demonstratePathHandling(Path basePath, String relativePath) {
         if (relativePath.startsWith("-")) {
             System.out.println("Invalid relative path. Negative values are not allowed.");
@@ -114,12 +119,7 @@ public class OrderHistory {
         System.out.println("Relativized Path: " + relativizedPath);
     }
 
-    /**
-     * Dynamically determines the date format based on the locale.
-     *
-     * @param locale The locale to determine the date format for.
-     * @return The appropriate date format string.
-     */
+    // Dynamically determines the date format based on the locale.
     private String getDateFormatForLocale(Locale locale) {
         if (locale.getLanguage().equals("es")) {
             return "dd-MM-yyyy"; // Spanish uses dashes
@@ -129,7 +129,7 @@ public class OrderHistory {
         return "dd/MM/yyyy"; // Default format
     }
 
-    // Updated displayOrderSummary to use dynamic date format
+    // Displays a summary of an order using localized messages.
     public void displayOrderSummary(Order order, ResourceBundle messages, Locale locale) {
         System.out.println("\n" + "=".repeat(40));
         System.out.println(" " + messages.getString("order_summary"));
@@ -175,7 +175,7 @@ public class OrderHistory {
         System.out.println("=".repeat(40));
     }
 
-    // Updated discount input method
+    // Retrieves a valid discount percentage from the user.
     private double getValidDiscount(ResourceBundle messages, Scanner scanner) {
         double discount;
         while (true) {
@@ -198,12 +198,7 @@ public class OrderHistory {
         return discount;
     }
 
-    /**
-     * Retrieves the menu instance.
-     * This is a placeholder method and should be replaced with the actual logic to retrieve the Menu object.
-     *
-     * @return A new Menu instance.
-     */
+    // Placeholder method to retrieve the menu instance.
     private Menu getMenu() {
         return new Menu(); // Replace with actual logic to retrieve the Menu instance
     }

@@ -45,6 +45,8 @@ public class Order implements Serializable {
         return Collections.unmodifiableList(dishes);
     }
 
+    // Adds a dish to the order.
+    // Throws an exception if the dish is null.
     public void addDish(Dish dish) throws InvalidOrderException {
         if (dish == null) {
             throw new InvalidOrderException("Dish cannot be null.");
@@ -52,6 +54,8 @@ public class Order implements Serializable {
         dishes.add(dish);
     }
 
+    // Removes a dish from the order.
+    // Displays a message if the dish is not found.
     public void removeDish(Dish dish) {
         if (dishes.contains(dish)) {
             dishes.remove(dish);
@@ -61,15 +65,18 @@ public class Order implements Serializable {
         }
     }
 
+    // Clears all dishes from the order.
     public void clearOrder() {
         dishes.clear();
         System.out.println("Order has been cleared.");
     }
 
+    // Sets the final price of the order after applying discounts.
     public void setFinalPrice(double finalPrice) {
         this.finalPrice = finalPrice;
     }
 
+    // Retrieves the final price of the order.
     public double getFinalPrice() {
         return finalPrice;
     }
@@ -117,6 +124,8 @@ public class Order implements Serializable {
      * @return The parsed Order object.
      * @throws IllegalArgumentException If the string format is invalid.
      */
+    // Parses a string representation of an order and returns an Order object.
+    // Assumes the string is in a specific format.
     public static Order parse(String orderString, Menu menu) {
         String[] parts = orderString.split(",");
         if (parts.length < 3) {

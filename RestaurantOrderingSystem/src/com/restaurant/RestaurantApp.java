@@ -10,73 +10,74 @@ import java.time.format.*;
 
 public class RestaurantApp {
 
-    // List of waiter names used for assigning random waiters to tables
+    // A list of waiter names that will be randomly assigned to tables.
     private static final List<String> WAITER_NAMES = List.of("Sophia", "Liam", "Olivia", "Noah", "Emma");
 
-    // Number of supported languages for the application
+    // The total number of languages supported by the application.
     private static final int LANGUAGE_COUNT = 10;
 
     public static void main(String[] args) {
-        // Scanner is used to read user input from the console
+        // Scanner is used to read input from the user via the console.
         Scanner scanner = new Scanner(System.in);
 
-        // Menu object represents the restaurant's menu
+        // The Menu object represents the restaurant's menu, containing all available dishes.
         Menu menu = new Menu();
 
-        // OrderHistory object manages the history of all orders
+        // The OrderHistory object keeps track of all orders placed by customers.
         OrderHistory orderHistory = new OrderHistory();
 
-        boolean exit = false; // Flag to control the main loop
+        // This flag controls whether the application should keep running or exit.
+        boolean exit = false;
 
-        // Display the language selection menu to the user
+        // Step 1: Display the language selection menu to the user.
         printLanguageSelectionMenu();
 
-        // Get the user's choice of language and set the corresponding locale
+        // Step 2: Get the user's choice of language and set the corresponding locale (language and region).
         int languageChoice = getValidLanguageChoice(scanner);
         Locale locale = getLocaleForLanguageChoice(languageChoice);
 
-        // Load the appropriate resource bundle for the selected language
+        // Step 3: Load the appropriate resource bundle (translations) for the selected language.
         ResourceBundle messages = loadResourceBundle(locale);
 
-        // Display a welcome message in the selected language
+        // Step 4: Display a welcome message in the selected language.
         printWelcomeMessage(messages);
 
-        // Main loop for the application
+        // Step 5: Main loop of the application. This keeps running until the user chooses to exit.
         while (!exit) {
-            // Display the main menu options
+            // Display the main menu options to the user.
             printMainMenu(messages);
 
-            // Get the user's choice from the main menu
+            // Get the user's choice from the main menu.
             int choice = getValidMenuChoice(scanner, messages);
 
-            // Handle the user's choice using a switch statement
+            // Handle the user's choice using a switch statement.
             switch (choice) {
-                case 1 -> menu.displayMenuByCategory(messages); // Display the menu categorized by dish type
-                case 2 -> menu.displayDailySpecials(); // Show today's specials
-                case 3 -> processOrder(menu, scanner, orderHistory, messages, locale); // Process a new order
-                case 4 -> orderHistory.displayHistory(); // Display the order history
-                case 5 -> saveOrderHistory(scanner, orderHistory, messages); // Save order history to a file
-                case 6 -> loadOrderHistory(scanner, orderHistory, messages); // Load order history from a file
-                case 7 -> bookEvent(scanner, messages); // Book an event
-                case 8 -> recommendDishes(orderHistory, menu, messages); // Show AI-powered dish recommendations
+                case 1 -> menu.displayMenuByCategory(messages); // Show the menu grouped by dish type.
+                case 2 -> menu.displayDailySpecials(); // Show today's special dishes.
+                case 3 -> processOrder(menu, scanner, orderHistory, messages, locale); // Allow the user to place an order.
+                case 4 -> orderHistory.displayHistory(); // Show the history of all previous orders.
+                case 5 -> saveOrderHistory(scanner, orderHistory, messages); // Save the order history to a file.
+                case 6 -> loadOrderHistory(scanner, orderHistory, messages); // Load order history from a file.
+                case 7 -> bookEvent(scanner, messages); // Allow the user to book an event.
+                case 8 -> recommendDishes(orderHistory, menu, messages); // Show AI-powered dish recommendations.
                 case 9 -> {
-                    // Exit the application
+                    // Exit the application.
                     System.out.println("\n" + messages.getString("thank_you"));
                     exit = true;
                 }
-                default -> System.out.println(messages.getString("invalid_choice")); // Handle invalid menu choices
+                default -> System.out.println(messages.getString("invalid_choice")); // Handle invalid menu choices.
             }
         }
 
-        // Display a goodbye message before exiting
+        // Display a goodbye message before the application exits.
         System.out.println(messages.getString("goodbye"));
     }
 
-    // Method to display the language selection menu
+    // Displays the language selection menu to the user.
     private static void printLanguageSelectionMenu() {
         System.out.println("============================================");
         System.out.println("Select a language:");
-        // List of supported languages
+        // List of supported languages.
         System.out.println("1. English");
         System.out.println("2. Portuguese");
         System.out.println("3. French");
@@ -90,43 +91,45 @@ public class RestaurantApp {
         System.out.println("============================================");
     }
 
-    // Method to get a valid language choice from the user
+    // Prompts the user to select a language and ensures the input is valid.
     private static int getValidLanguageChoice(Scanner scanner) {
         int languageChoice = -1;
         while (languageChoice < 1 || languageChoice > LANGUAGE_COUNT) {
             System.out.print("Please enter a number between 1 and " + LANGUAGE_COUNT + ": ");
             if (scanner.hasNextInt()) {
                 languageChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine(); // Consume the newline character.
                 if (languageChoice < 1 || languageChoice > LANGUAGE_COUNT) {
                     System.out.println("Invalid choice. Try again.");
                 }
             } else {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine(); // Consume invalid input
+                scanner.nextLine(); // Consume the invalid input.
             }
         }
         return languageChoice;
     }
 
-    // Method to map the user's language choice to a Locale object
+    // Maps the user's language choice to a Locale object, which represents the language and region.
+    // This helps in loading the correct translations for the application.
     private static Locale getLocaleForLanguageChoice(int languageChoice) {
         Map<Integer, Locale> localeMap = Map.of(
             1, Locale.ENGLISH,
-            2, Locale.of("pt", "PT"),
-            3, Locale.of("fr", "FR"),
-            4, Locale.of("it", "IT"),
-            5, Locale.of("es", "ES"),
+            2, Locale.of("pt", "PT"), // Portuguese
+            3, Locale.of("fr", "FR"), // French
+            4, Locale.of("it", "IT"), // Italian
+            5, Locale.of("es", "ES"), // Spanish
             6, Locale.GERMAN,
-            7, Locale.CHINA,
-            8, Locale.of("ru", "RU"),
-            9, Locale.of("no", "NO"),
-            10, Locale.JAPAN
+            7, Locale.CHINA, // Simplified Chinese
+            8, Locale.of("ru", "RU"), // Russian
+            9, Locale.of("no", "NO"), // Norwegian
+            10, Locale.JAPAN // Japanese
         );
-        return localeMap.getOrDefault(languageChoice, Locale.ENGLISH);
+        return localeMap.getOrDefault(languageChoice, Locale.ENGLISH); // Default to English if the choice is invalid.
     }
 
-    // Method to load the appropriate resource bundle for the selected language
+    // Loads the appropriate resource bundle (translations) for the selected language.
+    // If the resource bundle is missing, it falls back to English.
     private static ResourceBundle loadResourceBundle(Locale locale) {
         try {
             return ResourceBundle.getBundle("com.restaurant.messages", locale);
@@ -136,44 +139,49 @@ public class RestaurantApp {
         }
     }
 
-    // Method to display a welcome message in the selected language
+    // Displays a welcome message in the selected language.
+    // The message includes the restaurant's name and tagline.
     private static void printWelcomeMessage(ResourceBundle messages) {
         System.out.println();
         System.out.println("============================================");
+        // Replace the restaurant name in the welcome message with the actual name.
         System.out.println(messages.getString("welcome").replace("Sabor Brasileiro", "Galway To São Paulo Restaurant"));
-        System.out.println(messages.getString("tagline"));
+        System.out.println(messages.getString("tagline")); // Display the restaurant's tagline.
         System.out.println("============================================\n");
     }
 
-    // Method to display the main menu options
+    // Displays the main menu options to the user.
+    // Each option corresponds to a specific feature of the application.
     private static void printMainMenu(ResourceBundle messages) {
         System.out.println("\n" + messages.getString("choose_option"));
-        System.out.println("1. " + messages.getString("view_menu"));
+        System.out.println("1. " + messages.getString("view_menu")); 
         System.out.println("2. " + messages.getString("view_specials"));
-        System.out.println("3. " + messages.getString("place_order"));
-        System.out.println("4. " + messages.getString("view_history"));
-        System.out.println("5. " + messages.getString("save_history"));
-        System.out.println("6. " + messages.getString("load_history"));
-        System.out.println("7. " + messages.getString("book_event"));
-        System.out.println("8. " + messages.getString("ai_recommendations_header"));
-        System.out.println("9. " + messages.getString("exit"));
+        System.out.println("3. " + messages.getString("place_order")); 
+        System.out.println("4. " + messages.getString("view_history")); 
+        System.out.println("5. " + messages.getString("save_history")); 
+        System.out.println("6. " + messages.getString("load_history")); 
+        System.out.println("7. " + messages.getString("book_event")); 
+        System.out.println("8. " + messages.getString("ai_recommendations_header")); 
+        System.out.println("9. " + messages.getString("exit")); 
         System.out.print(messages.getString("enter_choice"));
     }
 
-    // Method to get a valid menu choice from the user
+    // Gets a valid menu choice from the user.
+    // Ensures that the input is a valid number corresponding to a menu option.
     private static int getValidMenuChoice(Scanner scanner, ResourceBundle messages) {
         int choice = -1;
         if (scanner.hasNextInt()) {
             choice = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // Consume the newline character.
         } else {
-            System.out.println(messages.getString("invalid_input"));
-            scanner.nextLine();
+            System.out.println(messages.getString("invalid_input")); // Display an error message for invalid input.
+            scanner.nextLine(); // Consume the invalid input.
         }
         return choice;
     }
 
-    // Method to save the order history to a file
+    // Method to save the order history to a file.
+    // Prompts the user for a file name and saves the history in that file.
     private static void saveOrderHistory(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
         System.out.print(messages.getString("enter_file_save"));
         String fileName = scanner.nextLine();
@@ -181,7 +189,8 @@ public class RestaurantApp {
         orderHistory.saveToFile(filePath);
     }
 
-    // Method to load the order history from a file
+    // Method to load the order history from a file.
+    // Prompts the user for a file name and loads the history from that file.
     private static void loadOrderHistory(Scanner scanner, OrderHistory orderHistory, ResourceBundle messages) {
         System.out.print(messages.getString("enter_file_load"));
         String fileName = scanner.nextLine();
@@ -189,7 +198,8 @@ public class RestaurantApp {
         orderHistory.loadFromFile(filePath);
     }
 
-    // Method to process a new order
+    // Method to process a new order.
+    // This includes selecting dishes, calculating discounts, and finalizing the order.
     private static void processOrder(Menu menu, Scanner scanner, OrderHistory orderHistory, ResourceBundle messages, Locale locale) {
         List<Table> tables = List.of(
                 new Table(1, 2),
@@ -332,7 +342,8 @@ public class RestaurantApp {
         }
     }
 
-    // Method to book an event
+    // Method to book an event.
+    // Collects event details such as name, date, time, and guest count.
     private static void bookEvent(Scanner scanner, ResourceBundle messages) {
         System.out.println("\n" + messages.getString("event_booking_header"));
         System.out.print(messages.getString("enter_event_name"));
@@ -401,7 +412,8 @@ public class RestaurantApp {
         }
     }
 
-    // Method to recommend dishes based on order history
+    // Method to recommend dishes based on order history.
+    // Uses AI-powered logic to suggest the most frequently ordered dishes.
     private static void recommendDishes(OrderHistory orderHistory, Menu menu, ResourceBundle messages) {
         System.out.println("\n" + messages.getString("ai_recommendations_header").replace("IA", "AI"));
 
