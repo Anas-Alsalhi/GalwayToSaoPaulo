@@ -24,5 +24,6 @@
 				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
 			</matcher>
 		</filter>
+		<!-- Ensure README.md is not filtered -->
 	</filteredResources>
 </projectDescription>

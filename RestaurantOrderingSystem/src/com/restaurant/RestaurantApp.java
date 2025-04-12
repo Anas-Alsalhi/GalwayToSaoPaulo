@@ -313,9 +313,15 @@ public class RestaurantApp {
                 long count = entry.getValue();
                 executor.submit(() -> {
                     try {
-                        System.out.printf(messages.getString("preparing_dish") + " (%d)%n", dishName, count); // Grouped preparation
+                        String preparingMessage = String.format(
+                            messages.getString("preparing_dish"), dishName
+                        );
+                        String preparedMessage = String.format(
+                            messages.getString("prepared_dish"), dishName
+                        );
+                        System.out.printf("%s (%d)%n", preparingMessage, count); // Grouped preparation
                         Thread.sleep(1000 + random.nextInt(2000));
-                        System.out.printf(messages.getString("prepared_dish") + " (%d)%n", dishName, count); // Grouped completion
+                        System.out.printf("%s (%d)%n", preparedMessage, count); // Grouped completion
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } finally {
