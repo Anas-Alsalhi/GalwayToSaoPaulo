@@ -225,9 +225,13 @@ public class RestaurantApp {
         System.out.printf("%25s%n", messages.getString("menu"));
         System.out.println("=".repeat(50));
 
+        Map<String, Integer> dishCountMap = new HashMap<>();
         for (int i = 0; i < allDishes.size(); i++) {
             Dish dish = allDishes.get(i);
-            System.out.printf("%-3d %-30s (€ %.2f)%n", i + 1, dish.name(), dish.price());
+            String dishName = dish.name();
+            int count = dishCountMap.getOrDefault(dishName, 0) + 1;
+            dishCountMap.put(dishName, count);
+            System.out.printf("%-3d %-30s (€ %.2f)%n", i + 1, dishName + " (" + count + ")", dish.price());
         }
 
         System.out.println("=".repeat(50));
@@ -303,8 +307,7 @@ public class RestaurantApp {
         order.setFinalPrice(discountedTotal);
 
         LocalDateTime now = LocalDateTime.now();
-        String dateFormat = getDateFormatForLocale(locale); // Dynamically determine the date format
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat + " HH:mm", locale);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withLocale(locale); // Explicit pattern
         System.out.println(String.format("\n%s: %s", messages.getString("order_timestamp"), now.format(formatter))); // Simplified format
 
         Map<String, Long> dishCounts = order.getDishes().stream()
@@ -324,9 +327,9 @@ public class RestaurantApp {
                         String preparedMessage = String.format(
                             messages.getString("prepared_dish"), dishName
                         );
-                        System.out.printf("%s (%d)%n", preparingMessage, count); // Grouped preparation
+                        System.out.printf("%s (%d)%n", preparingMessage, count); // Log preparation
                         Thread.sleep(1000 + random.nextInt(2000));
-                        System.out.printf("%s (%d)%n", preparedMessage, count); // Grouped completion
+                        System.out.printf("%s (%d)%n", preparedMessage, count); // Log completion
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         System.err.println(messages.getString("preparation_interrupted"));
@@ -370,11 +373,6 @@ public class RestaurantApp {
         }
     }
 
-    // Helper method to determine the date format based on the locale.
-    // This ensures that dates are displayed in a format familiar to the user.
-    private static String getDateFormatForLocale(Locale locale) {
-        return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale).toString();
-    }
 
     // Method to book an event.
     // Collects event details such as name, date, time, and guest count.
