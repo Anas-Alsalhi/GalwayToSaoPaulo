@@ -137,14 +137,14 @@ public class Order implements Serializable {
         int tableNumber;
         int waiterId;
         try {
-            tableNumber = Integer.parseInt(parts[0]);
-            waiterId = Integer.parseInt(parts[2]);
+            tableNumber = Integer.parseInt(parts[0].trim());
+            waiterId = Integer.parseInt(parts[2].trim());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Table number and waiter ID must be valid integers.", e);
         }
 
-        String waiterName = parts[1];
-        if (waiterName.isBlank()) {
+        String waiterName = parts[1].trim();
+        if (waiterName.isEmpty()) {
             throw new IllegalArgumentException("Waiter name cannot be empty.");
         }
 
@@ -154,6 +154,8 @@ public class Order implements Serializable {
 
         List<String> failedDishes = new ArrayList<>();
         Arrays.stream(parts, 3, parts.length)
+              .map(String::trim)
+              .filter(dishName -> !dishName.isEmpty())
               .map(menu::findDishByName)
               .forEach(optionalDish -> optionalDish.ifPresentOrElse(
                   dish -> {
