@@ -1,0 +1,33 @@
+Order Summary
+=============
+Table Number: 3
+Waiter: Sophia
+Seated Customers: 4
+
+Ordered Items:
+- Fish Cake (€6.49)
+- Colcannon (€7.99)
+- Boxty (€7.99)
+- Feijoada (€14.99)
+- Fish Cake (€6.49)
+- Fish Cake (€6.49)
+- Fish Cake (€6.49)
+- Boxty (€7.99)
+
+Subtotal: €64.92
+Discount: 23.00%
+Total After Discount: €49.99
+Order Timestamp: 13/04/2025 00:34
+
+Dish Preparation Logs:
+- Fish Cake (1 of 4) prepared
+- Fish Cake (2 of 4) prepared
+- Fish Cake (3 of 4) prepared
+- Fish Cake (4 of 4) prepared
+- Colcannon (1 of 1) prepared
+- Boxty (1 of 2) prepared
+- Boxty (2 of 2) prepared
+- Feijoada (1 of 1) prepared
+
+Order processed successfully!
+Order added to history.

@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import java.time.*;
 import java.time.format.*;
 import java.text.SimpleDateFormat;
+import java.nio.file.Files;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class RestaurantApp {
 
@@ -306,63 +309,61 @@ public class RestaurantApp {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", locale);
         String formattedTimestamp = dateFormat.format(new Date());
         System.out.printf(messages.getString("order_timestamp").replace(" (dd/MM/yyyy HH:mm)", "") + "%n", formattedTimestamp);
+        System.out.println(); // Add a blank line for better readability
 
         Map<String, Long> dishCounts = order.getDishes().stream()
             .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
 
-        CountDownLatch latch = new CountDownLatch(dishCounts.values().stream().mapToInt(Long::intValue).sum());
-        ExecutorService executor = Executors.newFixedThreadPool(3);
-        List<String> preparationLogs = Collections.synchronizedList(new ArrayList<>());
+        // Process dishes with ExecutorCompletionService for parallel preparation
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-        try {
-            // Maintain the order of dishes as they appear in the order
-            List<String> orderedDishNames = order.getDishes().stream()
-                .map(Dish::name)
-                .distinct()
-                .collect(Collectors.toList());
+        List<String> orderedDishNames = order.getDishes().stream()
+            .map(Dish::name)
+            .distinct()
+            .collect(Collectors.toList());
 
-            for (String dishName : orderedDishNames) {
-                long count = dishCounts.get(dishName);
+        for (String dishName : orderedDishNames) {
+            long count = dishCounts.get(dishName);
+
+            executorService.submit(() -> {
+                List<String> dishLogs = new ArrayList<>();
                 for (int i = 1; i <= count; i++) {
-                    int instanceNumber = i;
-                    executor.submit(() -> {
-                        try {
-                            String preparingMessage = String.format(
-                                messages.getString("preparing_dish") + " (%d of %d)", dishName, instanceNumber, count
-                            );
-                            preparationLogs.add(preparingMessage);
-                            Thread.sleep(1000 + random.nextInt(2000));
-                            String preparedMessage = String.format(
-                                messages.getString("prepared_dish") + " (%d of %d)", dishName, instanceNumber, count
-                            );
-                            preparationLogs.add(preparedMessage);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            System.err.println(messages.getString("preparation_interrupted"));
-                        } finally {
-                            latch.countDown();
-                        }
-                    });
-                }
-            }
+                    int dishIndex = i;
+                    try {
+                        // Log preparation message for each portion
+                        String preparingMessage = String.format(
+                            messages.getString("preparing_dish") + " (%d of %d)", dishName, dishIndex, count
+                        );
+                        dishLogs.add(preparingMessage);
 
-            latch.await();
-            preparationLogs.forEach(System.out::println);
-            System.out.println("\n" + messages.getString("all_dishes_prepared"));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.err.println(messages.getString("preparation_interrupted"));
-        } finally {
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
+                        // Simulate preparation time
+                        Thread.sleep(1000 + new Random().nextInt(2000));
+
+                        // Log completion message for each portion
+                        String preparedMessage = String.format(
+                            messages.getString("prepared_dish") + " (%d of %d)", dishName, dishIndex, count
+                        );
+                        dishLogs.add(preparedMessage);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        dishLogs.add(messages.getString("preparation_interrupted"));
+                    }
                 }
-            } catch (InterruptedException e) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
+                // Print logs for this dish in order
+                synchronized (System.out) {
+                    dishLogs.forEach(System.out::println);
+                }
+            });
         }
+
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(1, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            System.err.println(messages.getString("preparation_interrupted") + ": " + e.getMessage());
+        }
+
+        System.out.println("\n" + messages.getString("all_dishes_prepared"));
 
         try (ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor()) {
             Future<String> processingTask = singleThreadExecutor.submit(() -> {
@@ -379,8 +380,46 @@ public class RestaurantApp {
             orderHistory.addOrder(order);
             System.out.println("\n" + messages.getString("order_added_history"));
         }
-    }
 
+        // Save order summary to a text file
+        try {
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HHmm").format(new Date());
+            Path ordersDir = Paths.get("orders");
+            if (!Files.exists(ordersDir)) {
+                Files.createDirectories(ordersDir);
+            }
+            Path orderFile = ordersDir.resolve("order_" + timestamp + ".txt");
+
+            try (BufferedWriter writer = Files.newBufferedWriter(orderFile)) {
+                writer.write("Order Summary\n");
+                writer.write("=============\n");
+                writer.write(String.format("Table Number: %d\n", table.getTableNumber()));
+                writer.write(String.format("Waiter: %s\n", waiter.getName()));
+                writer.write(String.format("Seated Customers: %d\n", seatedCustomers));
+                writer.write("\nOrdered Items:\n");
+                for (Dish dish : order.getDishes()) {
+                    writer.write(String.format("- %s (€%.2f)\n", dish.name(), dish.price()));
+                }
+                writer.write(String.format("\nSubtotal: €%.2f\n", total));
+                writer.write(String.format("Discount: %.2f%%\n", discount));
+                writer.write(String.format("Total After Discount: €%.2f\n", discountedTotal));
+                writer.write(String.format("Order Timestamp: %s\n", formattedTimestamp));
+                writer.write("\nDish Preparation Logs:\n");
+                for (String dishName : orderedDishNames) {
+                    long count = dishCounts.get(dishName);
+                    for (int i = 1; i <= count; i++) {
+                        writer.write(String.format("- %s (%d of %d) prepared\n", dishName, i, count));
+                    }
+                }
+                writer.write("\n" + messages.getString("order_processed") + "\n");
+                writer.write(messages.getString("order_added_history") + "\n");
+            }
+
+            System.out.println("Order summary saved to: " + orderFile.toAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Failed to save order summary: " + e.getMessage());
+        }
+    }
 
     // Method to book an event.
     // Collects event details such as name, date, time, and guest count.

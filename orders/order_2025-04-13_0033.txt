@@ -1,0 +1,29 @@
+Order Summary
+=============
+Table Number: 2
+Waiter: Sophia
+Seated Customers: 3
+
+Ordered Items:
+- Fish Cake (€6.49)
+- Colcannon (€7.99)
+- Boxty (€7.99)
+- Salad (€6.99)
+- Salad (€6.99)
+- Salad (€6.99)
+
+Subtotal: €43.44
+Discount: 8.00%
+Total After Discount: €39.96
+Order Timestamp: 13/04/2025 00:33
+
+Dish Preparation Logs:
+- Fish Cake (1 of 1) prepared
+- Colcannon (1 of 1) prepared
+- Boxty (1 of 1) prepared
+- Salad (1 of 3) prepared
+- Salad (2 of 3) prepared
+- Salad (3 of 3) prepared
+
+Order processed successfully!
+Order added to history.
