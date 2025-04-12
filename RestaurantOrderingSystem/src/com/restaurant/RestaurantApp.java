@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.time.*;
 import java.time.format.*;
+import java.text.SimpleDateFormat;
 
 public class RestaurantApp {
 
@@ -60,13 +61,13 @@ public class RestaurantApp {
                 case 6 -> loadOrderHistory(scanner, orderHistory, messages); // Load order history from a file.
                 case 7 -> bookEvent(scanner, messages); // Allow the user to book an event.
                 case 8 -> recommendDishes(orderHistory, menu, messages); // Show AI-powered dish recommendations.
-                case 9 -> {
+                case 9 -> saveOrderHistoryAsText(scanner, orderHistory, messages);
+                case 10 -> loadOrderHistoryFromText(scanner, orderHistory, messages);
+                case 11 -> {
                     // Exit the application.
                     System.out.println("\n" + messages.getString("thank_you"));
                     exit = true;
                 }
-                case 10 -> saveOrderHistoryAsText(scanner, orderHistory, messages);
-                case 11 -> loadOrderHistoryFromText(scanner, orderHistory, messages);
                 default -> System.out.println(messages.getString("invalid_choice")); // Handle invalid menu choices.
             }
         }
@@ -164,9 +165,9 @@ public class RestaurantApp {
         System.out.println("6. " + messages.getString("load_history")); 
         System.out.println("7. " + messages.getString("book_event")); 
         System.out.println("8. " + messages.getString("ai_recommendations_header")); 
-        System.out.println("9. " + messages.getString("exit")); 
-        System.out.println("10. Save Order History as Text");
-        System.out.println("11. Load Order History from Text");
+        System.out.println("9. Save Order History as Text");
+        System.out.println("10. Load Order History from Text");
+        System.out.println("11. " + messages.getString("exit")); 
         System.out.print(messages.getString("enter_choice"));
     }
 
