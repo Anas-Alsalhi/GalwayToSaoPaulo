@@ -430,64 +430,51 @@ public class RestaurantApp {
         }
 
         // Consolidate and display unique ordered dish descriptions
-if (order != null) {
-    // ✅ Build a map of unique dish names to descriptions (first occurrence only)
-    Map<String, String> uniqueDescriptions = new LinkedHashMap<>();
-    order.getDishes().forEach(dish -> 
-        uniqueDescriptions.putIfAbsent(dish.name(), dish.getDescription())
-    );
+        if (order != null) {
+            // Build a map of unique dish names to descriptions (first occurrence only)
+            Map<String, String> uniqueDescriptions = new LinkedHashMap<>();
+            order.getDishes().forEach(dish -> 
+                uniqueDescriptions.putIfAbsent(dish.name(), dish.getDescription())
+            );
 
-    // Format for display
-    List<String> uniqueOrderedDishDescriptions = uniqueDescriptions.entrySet().stream()
-        .map(entry -> entry.getKey() + ": " + entry.getValue())
-        .collect(Collectors.toList());
+            // Format for display
+            System.out.println("\nOrdered Dish Descriptions:");
+            uniqueDescriptions.forEach((dishName, description) -> 
+                System.out.println(" - " + dishName + ": " + description)
+            );
 
-    System.out.println("\nOrdered Dish Descriptions:");
-    uniqueOrderedDishDescriptions.forEach(System.out::println);
+            // Display order details (with quantities)
+            System.out.println("\nOrder Details:");
+            Map<String, Long> dishQuantities = order.getDishes().stream()
+                .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
+            dishQuantities.forEach((dishName, quantity) ->
+                System.out.println(" - " + dishName + " x" + quantity)
+            );
 
-    // ✅ Display order details (with quantities)
-    System.out.println("\nOrder Details:");
-    Map<String, Long> dishQuantities = order.getDishes().stream()
-        .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
-    dishQuantities.forEach((dishName, quantity) ->
-        System.out.println(" - " + dishName + " x" + quantity));
+            // Display vegetarian dishes
+            Predicate<Dish> isVegetarian = Dish::isVegetarian;
+            List<Dish> vegetarianDishes = menu.getAllDishes().stream()
+                .filter(isVegetarian)
+                .collect(Collectors.toList());
 
-    // ✅ Display vegetarian dishes
-    Predicate<Dish> isVegetarian = Dish::isVegetarian;
-    List<Dish> vegetarianDishes = menu.getAllDishes().stream()
-        .filter(isVegetarian)
-        .collect(Collectors.toList());
+            System.out.println("\nVegetarian Dishes:");
+            vegetarianDishes.forEach(dish -> 
+                System.out.println(" - " + dish.name() + ": " + dish.getLocalizedDescription(messages))
+            );
 
-    System.out.println("\n" + messages.getString("vegetarian_dishes"));
-    vegetarianDishes.forEach(dish -> 
-        System.out.println(" - " + dish.name() + ": " + dish.getLocalizedDescription(messages))
-    );
+            // Display summary
+            int totalDishes = order.getDishes().size();
+            double discount = order.getDiscountPercentage();
+            double finalPrice = order.getFinalPrice();
 
-    // ✅ Display summary
-    int totalDishes = order.getDishes().size();
-    double discount = order.getDiscountPercentage();
-    double finalPrice = order.getFinalPrice();
-
-    System.out.println();
-    System.out.printf(messages.getString("total.dishes") + "\n", totalDishes);
-    System.out.printf(messages.getString("discount.applied") + "\n", discount);
-    System.out.printf(messages.getString("total.after.discount") + "\n", finalPrice);
-} else {
-    System.out.println("No order was processed.");
-}
-
-// ✅ Display ordered dish descriptions
-    System.out.println("\n" + messages.getString("ordered_dish_descriptions"));
-    Map<String, String> uniqueDescriptions = new LinkedHashMap<>();
-    order.getDishes().forEach(dish -> 
-        uniqueDescriptions.putIfAbsent(dish.name(), dish.getDescription())
-    );
-
-    uniqueDescriptions.forEach((dishName, description) -> 
-        System.out.println(" - " + dishName + ": " + description)
-    );
-}
-
+            System.out.println();
+            System.out.printf("Total dishes: %d\n", totalDishes);
+            System.out.printf("Discount applied: %.2f%%\n", discount);
+            System.out.printf("Total after discount: €%.2f\n", finalPrice);
+        } else {
+            System.out.println("No order was processed.");
+        }
+    }
 
     // Method to book an event.
     // Collects event details such as name, date, time, and guest count.
