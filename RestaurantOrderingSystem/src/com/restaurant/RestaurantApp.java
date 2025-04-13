@@ -443,7 +443,8 @@ public class RestaurantApp {
                 continue;
             }
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault());
+                // Explicitly set the date format to DD/MM/YYYY
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.getDefault());
                 LocalDate enteredDate = LocalDate.parse(eventDate, formatter);
                 if (enteredDate.isAfter(LocalDate.now())) {
                     break;
@@ -464,7 +465,8 @@ public class RestaurantApp {
                 continue;
             }
             try {
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault());
+                // Explicitly set the time format to HH:mm
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm").withLocale(Locale.getDefault());
                 LocalTime.parse(eventTime, timeFormatter);
                 break; // Valid time format
             } catch (DateTimeParseException e) {
