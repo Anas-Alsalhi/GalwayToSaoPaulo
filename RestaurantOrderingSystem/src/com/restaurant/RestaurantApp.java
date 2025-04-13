@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.time.*;
 import java.time.format.*;
@@ -426,6 +427,44 @@ public class RestaurantApp {
         } catch (Exception e) {
             System.err.println(messages.getString("error_processing_order") + ": " + e.getMessage());
         }
+
+        // Example of Predicate to filter vegetarian dishes
+        Predicate<Dish> isVegetarian = Dish::isVegetarian;
+        List<Dish> vegetarianDishes = menu.getAllDishes().stream()
+            .filter(isVegetarian)
+            .collect(Collectors.toList());
+
+        // Example of Function to map dish names to prices
+        Function<Dish, String> dishNameToPrice = dish -> dish.name() + " (€" + dish.price() + ")";
+        List<String> dishDescriptions = menu.getAllDishes().stream()
+            .map(dishNameToPrice)
+            .collect(Collectors.toList());
+
+        // Example of Supplier to provide a default dish
+        Supplier<Dish> defaultDishSupplier = () -> new Dish("Default Dish", 0.0, Dish.Category.MAIN_COURSE);
+        Dish defaultDish = defaultDishSupplier.get();
+
+        // Ensure order variable is declared and initialized
+        Order order = new Order(new Table(1, 4), new Waiter("Default Waiter", 1));
+
+        // Rename the lambda parameter to avoid conflict
+        Consumer<Order> printOrderDetails = o -> {
+            System.out.println("Order Details:");
+            o.getDishes().forEach(dish -> System.out.println(" - " + dish.name()));
+        };
+        printOrderDetails.accept(order);
+
+        // Use vegetarianDishes to display vegetarian options
+        System.out.println("Vegetarian Dishes:");
+        vegetarianDishes.forEach(dish -> System.out.println(" - " + dish.name()));
+
+        // Use dishDescriptions to display dish details
+        System.out.println("\nDish Descriptions:");
+        dishDescriptions.forEach(System.out::println);
+
+        // Use defaultDish to demonstrate a fallback option
+        System.out.println("\nDefault Dish:");
+        System.out.println(defaultDish.name() + " (€" + defaultDish.price() + ")");
     }
 
     // Method to book an event.

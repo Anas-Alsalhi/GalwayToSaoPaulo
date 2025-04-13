@@ -46,13 +46,18 @@ public class Dish implements Serializable {
         return category;
     }
 
+    public boolean isVegetarian() {
+        // Assuming vegetarian dishes are determined by their category
+        return this.category == Category.APPETIZER || this.category == Category.DESSERT;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Dish dish = (Dish) obj;
-        return Double.compare(dish.price, price) == 0 &&
-               name.equals(dish.name) &&
+        return Objects.equals(name, dish.name) &&
+               Objects.equals(price, dish.price) &&
                category == dish.category;
     }
 
