@@ -1,2 +1,25 @@
+# Ignore compiled class files
+bin/
+
 /bin/
+
+# Ignore build directories
+.gradle/
+
+# Ignore IDE-specific files
+*.iml
+.idea/
+
+# Ignore OS-specific files
 .DS_Store
+
+# Ignore logs
+*.log
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+
+# Ignore generated files
+orders/
