@@ -46,10 +46,13 @@ public class Order implements Serializable {
     }
 
     // Adds a dish to the order.
-    // Throws an exception if the dish is null.
+    // Throws an exception if the dish is null or already in the order.
     public void addDish(Dish dish) throws InvalidOrderException {
         if (dish == null) {
             throw new InvalidOrderException("Dish cannot be null.");
+        }
+        if (dishes.contains(dish)) {
+            throw new InvalidOrderException("Dish is already in the order.");
         }
         dishes.add(dish);
     }
@@ -57,12 +60,12 @@ public class Order implements Serializable {
     // Removes a dish from the order.
     // Displays a message if the dish is not found.
     public void removeDish(Dish dish) {
-        if (dishes.contains(dish)) {
-            dishes.remove(dish);
-            System.out.printf("Removed: %s (€%.2f)%n", dish.name(), dish.price());
-        } else {
+        if (dish == null || !dishes.contains(dish)) {
             System.out.println("Dish not found in the order.");
+            return;
         }
+        dishes.remove(dish);
+        System.out.printf("Removed: %s (€%.2f)%n", dish.name(), dish.price());
     }
 
     // Clears all dishes from the order.

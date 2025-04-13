@@ -56,8 +56,8 @@ public class OrderHistory implements Serializable {
 
     // Loads the order history from a binary file.
     public void loadFromFile(Path filePath) {
-        if (filePath == null || !Files.exists(filePath)) {
-            System.err.println("File does not exist: " + filePath);
+        if (filePath == null || Files.isDirectory(filePath)) {
+            System.err.println("Invalid file path. Please provide a valid file.");
             return;
         }
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {

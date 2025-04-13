@@ -21,62 +21,67 @@ public class RestaurantApp {
     private static final int LANGUAGE_COUNT = 10;
 
     public static void main(String[] args) {
-        // Scanner is used to read input from the user via the console.
-        Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in)) {
+            // The Menu object represents the restaurant's menu, containing all available dishes.
+            Menu menu = new Menu();
 
-        // The Menu object represents the restaurant's menu, containing all available dishes.
-        Menu menu = new Menu();
+            // The OrderHistory object keeps track of all orders placed by customers.
+            OrderHistory orderHistory = new OrderHistory();
 
-        // The OrderHistory object keeps track of all orders placed by customers.
-        OrderHistory orderHistory = new OrderHistory();
+            // This flag controls whether the application should keep running or exit.
+            boolean exit = false;
 
-        // This flag controls whether the application should keep running or exit.
-        boolean exit = false;
+            // Step 1: Display the language selection menu to the user.
+            printLanguageSelectionMenu();
 
-        // Step 1: Display the language selection menu to the user.
-        printLanguageSelectionMenu();
+            // Step 2: Get the user's choice of language and set the corresponding locale (language and region).
+            int languageChoice = getValidLanguageChoice(scanner);
+            Locale locale = getLocaleForLanguageChoice(languageChoice);
 
-        // Step 2: Get the user's choice of language and set the corresponding locale (language and region).
-        int languageChoice = getValidLanguageChoice(scanner);
-        Locale locale = getLocaleForLanguageChoice(languageChoice);
+            // Step 3: Load the appropriate resource bundle (translations) for the selected language.
+            ResourceBundle messages = loadResourceBundle(locale);
 
-        // Step 3: Load the appropriate resource bundle (translations) for the selected language.
-        ResourceBundle messages = loadResourceBundle(locale);
+            // Step 4: Display a welcome message in the selected language.
+            printWelcomeMessage(messages);
 
-        // Step 4: Display a welcome message in the selected language.
-        printWelcomeMessage(messages);
+            // Step 5: Main loop of the application. This keeps running until the user chooses to exit.
+            while (!exit) {
+                try {
+                    // Display the main menu options to the user.
+                    printMainMenu(messages);
 
-        // Step 5: Main loop of the application. This keeps running until the user chooses to exit.
-        while (!exit) {
-            // Display the main menu options to the user.
-            printMainMenu(messages);
+                    // Get the user's choice from the main menu.
+                    int choice = getValidMenuChoice(scanner, messages);
 
-            // Get the user's choice from the main menu.
-            int choice = getValidMenuChoice(scanner, messages);
-
-            // Handle the user's choice using a switch statement.
-            switch (choice) {
-                case 1 -> menu.displayMenuByCategory(messages); // Show the menu grouped by dish type.
-                case 2 -> menu.displayDailySpecials(3); // Show today's special dishes with a limit of 3.
-                case 3 -> processOrder(menu, scanner, orderHistory, messages, locale); // Allow the user to place an order.
-                case 4 -> orderHistory.displayHistory(); // Show the history of all previous orders.
-                case 5 -> saveOrderHistory(scanner, orderHistory, messages); // Save the order history to a file.
-                case 6 -> loadOrderHistory(scanner, orderHistory, messages); // Load order history from a file.
-                case 7 -> bookEvent(scanner, messages); // Allow the user to book an event.
-                case 8 -> recommendDishes(orderHistory, menu, messages); // Show AI-powered dish recommendations.
-                case 9 -> saveOrderHistoryAsText(scanner, orderHistory, messages);
-                case 10 -> loadOrderHistoryFromText(scanner, orderHistory, messages);
-                case 11 -> {
-                    // Exit the application.
-                    System.out.println("\n" + messages.getString("thank_you"));
-                    exit = true;
+                    // Handle the user's choice using a switch statement.
+                    switch (choice) {
+                        case 1 -> menu.displayMenuByCategory(messages); // Show the menu grouped by dish type.
+                        case 2 -> menu.displayDailySpecials(3); // Show today's special dishes with a limit of 3.
+                        case 3 -> processOrder(menu, scanner, orderHistory, messages, locale); // Allow the user to place an order.
+                        case 4 -> orderHistory.displayHistory(); // Show the history of all previous orders.
+                        case 5 -> saveOrderHistory(scanner, orderHistory, messages); // Save the order history to a file.
+                        case 6 -> loadOrderHistory(scanner, orderHistory, messages); // Load order history from a file.
+                        case 7 -> bookEvent(scanner, messages); // Allow the user to book an event.
+                        case 8 -> recommendDishes(orderHistory, menu, messages); // Show AI-powered dish recommendations.
+                        case 9 -> saveOrderHistoryAsText(scanner, orderHistory, messages);
+                        case 10 -> loadOrderHistoryFromText(scanner, orderHistory, messages);
+                        case 11 -> {
+                            // Exit the application.
+                            System.out.println("\n" + messages.getString("thank_you"));
+                            exit = true;
+                        }
+                        default -> System.out.println(messages.getString("invalid_choice")); // Handle invalid menu choices.
+                    }
+                } catch (Exception e) {
+                    System.err.println("An unexpected error occurred: " + e.getMessage());
                 }
-                default -> System.out.println(messages.getString("invalid_choice")); // Handle invalid menu choices.
             }
-        }
 
-        // Display a goodbye message before the application exits.
-        System.out.println(messages.getString("goodbye"));
+            // Display a goodbye message before the application exits.
+            System.out.println(messages.getString("goodbye"));
+        } catch (Exception e) {
+            System.err.println("Failed to initialize the application: " + e.getMessage());
+        }
     }
 
     // Displays the language selection menu to the user.

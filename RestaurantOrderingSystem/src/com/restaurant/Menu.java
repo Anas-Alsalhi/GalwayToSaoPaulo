@@ -76,6 +76,11 @@ public class Menu {
             categorizedMenu.get(dish.category()).add(dish);
         }
 
+        if (categorizedMenu == null || categorizedMenu.isEmpty()) {
+            System.out.println(messages.getString("menu_empty"));
+            return;
+        }
+
         System.out.println("\n" + "=".repeat(40));
         System.out.println(" " + messages.getString("menu"));
         System.out.println("=".repeat(40));

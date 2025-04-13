@@ -1,5 +1,6 @@
 module RestaurantOrderingSystem {
     exports com.restaurant;
-    requires java.logging; // Add if logging is used
-    requires java.sql;     // Add if database operations are used
+    requires java.logging; // Ensure this is used; remove if unnecessary
+    requires java.sql;     // Ensure this is used; remove if unnecessary
+    requires java.desktop; // Add if GUI components are used
 }
