@@ -1,0 +1,7 @@
+{
+    // ...existing settings...
+    "java.project.sourcePaths": [
+        "src"
+    ]
+    // ...existing settings...
+}

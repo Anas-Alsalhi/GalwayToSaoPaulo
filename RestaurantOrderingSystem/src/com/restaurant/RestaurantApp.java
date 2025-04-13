@@ -178,12 +178,14 @@ public class RestaurantApp {
     // Ensures that the input is a valid number corresponding to a menu option.
     private static int getValidMenuChoice(Scanner scanner, ResourceBundle messages) {
         int choice = -1;
-        if (scanner.hasNextInt()) {
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character.
-        } else {
-            System.out.println(messages.getString("invalid_input")); // Display an error message for invalid input.
-            scanner.nextLine(); // Consume the invalid input.
+        while (choice < 1 || choice > 11) { // Ensure valid menu choice range
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character.
+            } else {
+                System.out.println(messages.getString("invalid_input")); // Display an error message for invalid input.
+                scanner.nextLine(); // Consume the invalid input.
+            }
         }
         return choice;
     }
@@ -209,221 +211,211 @@ public class RestaurantApp {
     // Method to process a new order.
     // This includes selecting dishes, calculating discounts, and finalizing the order.
     private static void processOrder(Menu menu, Scanner scanner, OrderHistory orderHistory, ResourceBundle messages, Locale locale) {
-        List<Table> tables = List.of(
-                new Table(1, 2),
-                new Table(2, 4),
-                new Table(3, 6),
-                new Table(4, 8)
-        );
-        Random random = new Random();
-        Table table = tables.get(random.nextInt(tables.size()));
-        int seatedCustomers = random.nextInt(table.getCapacity()) + 1;
-        String waiterName = WAITER_NAMES.get(random.nextInt(WAITER_NAMES.size()));
-        int waiterId = random.nextInt(1000);
-        Waiter waiter = new Waiter(waiterName, waiterId);
+        try {
+            List<Table> tables = List.of(
+                    new Table(1, 2),
+                    new Table(2, 4),
+                    new Table(3, 6),
+                    new Table(4, 8)
+            );
+            Random random = new Random();
+            Table table = tables.get(random.nextInt(tables.size()));
+            int seatedCustomers = random.nextInt(table.getCapacity()) + 1;
+            String waiterName = WAITER_NAMES.get(random.nextInt(WAITER_NAMES.size()));
+            int waiterId = random.nextInt(1000);
+            Waiter waiter = new Waiter(waiterName, waiterId);
 
-        Order order = new Order(table, waiter);
-        List<Dish> allDishes = menu.getAllDishes();
+            Order order = new Order(table, waiter);
+            List<Dish> allDishes = menu.getAllDishes();
 
-        System.out.println("\n" + "=".repeat(50));
-        System.out.printf("%25s%n", messages.getString("menu"));
-        System.out.println("=".repeat(50));
+            System.out.println("\n" + "=".repeat(50));
+            System.out.printf("%25s%n", messages.getString("menu"));
+            System.out.println("=".repeat(50));
 
-        for (int i = 0; i < allDishes.size(); i++) {
-            Dish dish = allDishes.get(i);
-            System.out.printf("%-3d %-30s (€ %.2f)%n", i + 1, dish.name(), dish.price());
-        }
+            for (int i = 0; i < allDishes.size(); i++) {
+                Dish dish = allDishes.get(i);
+                System.out.printf("%-3d %-30s (€ %.2f)%n", i + 1, dish.name(), dish.price());
+            }
 
-        System.out.println("=".repeat(50));
+            System.out.println("=".repeat(50));
 
-        while (true) {
-            System.out.print(messages.getString("enter_dish_number"));
-            if (scanner.hasNextInt()) {
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-                if (choice < 0) {
-                    System.out.println(messages.getString("invalid_number"));
-                    continue;
-                }
-                if (choice == 0) {
-                    if (order.getDishes().isEmpty()) {
-                        System.out.println(messages.getString("error") + ": " + messages.getString("no_dishes_added"));
-                        continue; // Ensure at least one dish is added
+            while (true) {
+                System.out.print(messages.getString("enter_dish_number"));
+                if (scanner.hasNextInt()) {
+                    int choice = scanner.nextInt();
+                    scanner.nextLine();
+                    if (choice < 0) {
+                        System.out.println(messages.getString("invalid_number"));
+                        continue;
                     }
-                    break;
-                }
-                if (choice > 0 && choice <= allDishes.size()) {
-                    Dish selectedDish = allDishes.get(choice - 1);
-                    if (menu.isDishAvailable(selectedDish)) {
-                        try {
-                            order.addDish(selectedDish);
-                            System.out.printf(messages.getString("added_dish"), selectedDish.name(), selectedDish.price());
-                        } catch (InvalidOrderException e) {
-                            System.out.println(messages.getString("error") + ": " + e.getMessage());
+                    if (choice == 0) {
+                        if (order.getDishes().isEmpty()) {
+                            System.out.println(messages.getString("error") + ": " + messages.getString("no_dishes_added"));
+                            continue; // Ensure at least one dish is added
+                        }
+                        break;
+                    }
+                    if (choice > 0 && choice <= allDishes.size()) {
+                        Dish selectedDish = allDishes.get(choice - 1);
+                        if (menu.isDishAvailable(selectedDish)) {
+                            try {
+                                order.addDish(selectedDish);
+                                System.out.printf(messages.getString("added_dish"), selectedDish.name(), selectedDish.price());
+                            } catch (InvalidOrderException e) {
+                                System.out.println(messages.getString("error") + ": " + e.getMessage());
+                            }
+                        } else {
+                            System.out.println(messages.getString("dish_not_available"));
                         }
                     } else {
-                        System.out.println(messages.getString("dish_not_available"));
+                        System.out.println(messages.getString("invalid_number"));
                     }
                 } else {
-                    System.out.println(messages.getString("invalid_number"));
+                    System.out.println(messages.getString("invalid_input"));
+                    scanner.nextLine();
                 }
-            } else {
-                System.out.println(messages.getString("invalid_input"));
-                scanner.nextLine();
-            }
-        }
-
-        System.out.println("\n" + messages.getString("order_summary"));
-        System.out.println(messages.getString("table_details"));
-        System.out.println(String.format("  %s", String.format(messages.getString("capacity"), table.getCapacity())));
-        System.out.println(String.format("  %s", String.format(messages.getString("seated_customers"), seatedCustomers)));
-        System.out.println(String.format("  %s", String.format(messages.getString("waiter"), waiter.getName())));
-
-        System.out.println("\n" + messages.getString("ordered_items"));
-        order.printDetails();
-
-        double total = order.getDishes().stream().mapToDouble(Dish::price).sum();
-        System.out.println(String.format("\n%s", String.format(messages.getString("subtotal"), total)));
-
-        double discount = 0;
-        while (true) {
-            System.out.print(messages.getString("enter_discount").replace("(0-25)", "(0-25%)"));
-            String discountInput = scanner.nextLine().trim();
-
-            if (discountInput.isEmpty()) {
-                break;
             }
 
-            try {
-                discount = Double.parseDouble(discountInput);
-                if (discount >= 0 && discount <= 25) {
+            System.out.println("\n" + messages.getString("order_summary"));
+            System.out.println(messages.getString("table_details"));
+            System.out.println(String.format("  %s", String.format(messages.getString("capacity"), table.getCapacity())));
+            System.out.println(String.format("  %s", String.format(messages.getString("seated_customers"), seatedCustomers)));
+            System.out.println(String.format("  %s", String.format(messages.getString("waiter"), waiter.getName())));
+
+            System.out.println("\n" + messages.getString("ordered_items"));
+            order.printDetails();
+
+            double total = order.getDishes().stream().mapToDouble(Dish::price).sum();
+            System.out.println(String.format("\n%s", String.format(messages.getString("subtotal"), total)));
+
+            double discount = 0;
+            while (true) {
+                System.out.print(messages.getString("enter_discount").replace("(0-25)", "(0-25%)"));
+                String discountInput = scanner.nextLine().trim();
+
+                if (discountInput.isEmpty()) {
                     break;
-                } else {
-                    System.out.println(messages.getString("invalid_discount_range"));
                 }
-            } catch (NumberFormatException e) {
-                System.out.println(messages.getString("invalid_discount_format"));
-            }
-        }
 
-        double discountedTotal = total - (total * (discount / 100));
-        System.out.println(String.format("\n%s", String.format(messages.getString("total_after_discount"), discountedTotal)));
-
-        order.setDiscountPercentage(discount);
-        order.setFinalPrice(discountedTotal);
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", locale);
-        String formattedTimestamp = dateFormat.format(new Date());
-        System.out.printf(messages.getString("order_timestamp").replace(" (dd/MM/yyyy HH:mm)", "") + "%n", formattedTimestamp);
-        System.out.println(); // Add a blank line for better readability
-
-        Map<String, Long> dishCounts = order.getDishes().stream()
-            .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
-
-        // Process dishes with ExecutorCompletionService for parallel preparation
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-
-        List<String> orderedDishNames = order.getDishes().stream()
-            .map(Dish::name)
-            .distinct()
-            .collect(Collectors.toList());
-
-        for (String dishName : orderedDishNames) {
-            long count = dishCounts.get(dishName);
-
-            executorService.submit(() -> {
-                List<String> dishLogs = new ArrayList<>();
-                for (int i = 1; i <= count; i++) {
-                    int dishIndex = i;
-                    try {
-                        // Log preparation message for each portion
-                        String preparingMessage = String.format(
-                            messages.getString("preparing_dish") + " (%d of %d)", dishName, dishIndex, count
-                        );
-                        dishLogs.add(preparingMessage);
-
-                        // Simulate preparation time
-                        Thread.sleep(1000 + new Random().nextInt(2000));
-
-                        // Log completion message for each portion
-                        String preparedMessage = String.format(
-                            messages.getString("prepared_dish") + " (%d of %d)", dishName, dishIndex, count
-                        );
-                        dishLogs.add(preparedMessage);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        dishLogs.add(messages.getString("preparation_interrupted"));
+                try {
+                    discount = Double.parseDouble(discountInput);
+                    if (discount >= 0 && discount <= 25) {
+                        break;
+                    } else {
+                        System.out.println(messages.getString("invalid_discount_range"));
                     }
+                } catch (NumberFormatException e) {
+                    System.out.println(messages.getString("invalid_discount_format"));
                 }
-                // Print logs for this dish in order
-                synchronized (System.out) {
-                    dishLogs.forEach(System.out::println);
-                }
-            });
-        }
-
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(1, TimeUnit.HOURS);
-        } catch (InterruptedException e) {
-            System.err.println(messages.getString("preparation_interrupted") + ": " + e.getMessage());
-        }
-
-        System.out.println("\n" + messages.getString("all_dishes_prepared"));
-
-        try (ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor()) {
-            Future<String> processingTask = singleThreadExecutor.submit(() -> {
-                Thread.sleep(2000);
-                return messages.getString("order_processed");
-            });
-
-            System.out.println("\n" + processingTask.get());
-        } catch (Exception e) {
-            System.err.println(messages.getString("order_failed") + ": " + e.getMessage());
-        }
-
-        if (!orderHistory.getOrders().contains(order)) {
-            orderHistory.addOrder(order);
-            System.out.println("\n" + messages.getString("order_added_history"));
-        }
-
-        // Save order summary to a text file
-        try {
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HHmm").format(new Date());
-            Path ordersDir = Paths.get("orders");
-            if (!Files.exists(ordersDir)) {
-                Files.createDirectories(ordersDir);
             }
-            Path orderFile = ordersDir.resolve("order_" + timestamp + ".txt");
 
-            try (BufferedWriter writer = Files.newBufferedWriter(orderFile)) {
-                writer.write("Order Summary\n");
-                writer.write("=============\n");
-                writer.write(String.format("Table Number: %d\n", table.getTableNumber()));
-                writer.write(String.format("Waiter: %s\n", waiter.getName()));
-                writer.write(String.format("Seated Customers: %d\n", seatedCustomers));
-                writer.write("\nOrdered Items:\n");
-                for (Dish dish : order.getDishes()) {
-                    writer.write(String.format("- %s (€%.2f)\n", dish.name(), dish.price()));
-                }
-                writer.write(String.format("\nSubtotal: €%.2f\n", total));
-                writer.write(String.format("Discount: %.2f%%\n", discount));
-                writer.write(String.format("Total After Discount: €%.2f\n", discountedTotal));
-                writer.write(String.format("Order Timestamp: %s\n", formattedTimestamp));
-                writer.write("\nDish Preparation Logs:\n");
-                for (String dishName : orderedDishNames) {
-                    long count = dishCounts.get(dishName);
+            double discountedTotal = total - (total * (discount / 100));
+            System.out.println(String.format("\n%s", String.format(messages.getString("total_after_discount"), discountedTotal)));
+
+            order.setDiscountPercentage(discount);
+            order.setFinalPrice(discountedTotal);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", locale);
+            String formattedTimestamp = dateFormat.format(new Date());
+            System.out.printf(messages.getString("order_timestamp").replace(" (dd/MM/yyyy HH:mm)", "") + "%n", formattedTimestamp);
+            System.out.println(); // Add a blank line for better readability
+
+            Map<String, Long> dishCounts = order.getDishes().stream()
+                .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
+
+            // Process dishes with ExecutorCompletionService for parallel preparation
+            ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+            List<String> orderedDishNames = order.getDishes().stream()
+                .map(Dish::name)
+                .distinct()
+                .collect(Collectors.toList());
+
+            for (String dishName : orderedDishNames) {
+                long count = dishCounts.get(dishName);
+
+                executorService.submit(() -> {
                     for (int i = 1; i <= count; i++) {
-                        writer.write(String.format("- %s (%d of %d) prepared\n", dishName, i, count));
+                        int dishIndex = i;
+                        try {
+                            // Print preparation message
+                            System.out.printf("Preparing dish: %s (%d of %d)...%n", dishName, dishIndex, count);
+                            Thread.sleep(1000 + new Random().nextInt(2000)); // Simulate preparation time
+                            // Print completion message
+                            System.out.printf("Dish prepared: %s (%d of %d)!%n", dishName, dishIndex, count);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            System.out.println(messages.getString("preparation_interrupted"));
+                        }
                     }
-                }
-                writer.write("\n" + messages.getString("order_processed") + "\n");
-                writer.write(messages.getString("order_added_history") + "\n");
+                });
             }
 
-            System.out.println(messages.getString("order_summary_saved") + ": " + orderFile.toAbsolutePath());
-        } catch (IOException e) {
-            System.err.println("Failed to save order summary: " + e.getMessage());
+            executorService.shutdown();
+            try {
+                executorService.awaitTermination(1, TimeUnit.HOURS);
+            } catch (InterruptedException e) {
+                System.err.println(messages.getString("preparation_interrupted") + ": " + e.getMessage());
+            }
+
+            System.out.println("\n" + messages.getString("all_dishes_prepared"));
+
+            try (ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor()) {
+                Future<String> processingTask = singleThreadExecutor.submit(() -> {
+                    Thread.sleep(2000);
+                    return messages.getString("order_processed");
+                });
+
+                System.out.println("\n" + processingTask.get());
+            } catch (Exception e) {
+                System.err.println(messages.getString("order_failed") + ": " + e.getMessage());
+            }
+
+            if (!orderHistory.getOrders().contains(order)) {
+                orderHistory.addOrder(order);
+                System.out.println("\n" + messages.getString("order_added_history"));
+            }
+
+            // Save order summary to a text file
+            try {
+                String timestamp = new SimpleDateFormat("yyyy-MM-dd_HHmm").format(new Date());
+                Path ordersDir = Paths.get("orders");
+                if (!Files.exists(ordersDir)) {
+                    Files.createDirectories(ordersDir);
+                }
+                Path orderFile = ordersDir.resolve("order_" + timestamp + ".txt");
+
+                try (BufferedWriter writer = Files.newBufferedWriter(orderFile)) {
+                    writer.write("Order Summary\n");
+                    writer.write("=============\n");
+                    writer.write(String.format("Table Number: %d\n", table.getTableNumber()));
+                    writer.write(String.format("Waiter: %s\n", waiter.getName()));
+                    writer.write(String.format("Seated Customers: %d\n", seatedCustomers));
+                    writer.write("\nOrdered Items:\n");
+                    for (Dish dish : order.getDishes()) {
+                        writer.write(String.format("- %s (€%.2f)\n", dish.name(), dish.price()));
+                    }
+                    writer.write(String.format("\nSubtotal: €%.2f\n", total));
+                    writer.write(String.format("Discount: %.2f%%\n", discount));
+                    writer.write(String.format("Total After Discount: €%.2f\n", discountedTotal));
+                    writer.write(String.format("Order Timestamp: %s\n", formattedTimestamp));
+                    writer.write("\nDish Preparation Logs:\n");
+                    for (String dishName : orderedDishNames) {
+                        long count = dishCounts.get(dishName);
+                        for (int i = 1; i <= count; i++) {
+                            writer.write(String.format("- %s (%d of %d) prepared\n", dishName, i, count));
+                        }
+                    }
+                    writer.write("\n" + messages.getString("order_processed") + "\n");
+                    writer.write(messages.getString("order_added_history") + "\n");
+                }
+
+                System.out.println(messages.getString("order_summary_saved") + ": " + orderFile.toAbsolutePath());
+            } catch (IOException e) {
+                System.err.println("Failed to save order summary: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println(messages.getString("error_processing_order") + ": " + e.getMessage());
         }
     }
 
