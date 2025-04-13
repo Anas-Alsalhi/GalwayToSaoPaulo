@@ -408,7 +408,7 @@ public class RestaurantApp {
                     }
                     writer.write(String.format("\nSubtotal: €%.2f\n", total));
                     writer.write(String.format("Discount: %.2f%%\n", discount));
-                    writer.write(String.format("Total After Discount: €%.2f\n", discountedTotal));
+                    writer.write(String.format(messages.getString("total.after.discount") + "\n", discountedTotal));
                     writer.write(String.format("Order Timestamp: %s\n", formattedTimestamp));
                     writer.write("\nDish Preparation Logs:\n");
                     for (String dishName : orderedDishNames) {
@@ -471,7 +471,7 @@ if (order != null) {
     System.out.println();
     System.out.printf("Total Dishes: %d\n", totalDishes);
     System.out.printf("Discount Applied: %.2f%%\n", discount);
-    System.out.printf("Total After Discount: €%.2f\n", finalPrice);
+    System.out.printf(messages.getString("total.after.discount") + "\n", finalPrice);
 } else {
     System.out.println("No order was processed.");
 }
