@@ -231,6 +231,7 @@ public class RestaurantApp {
             Waiter waiter = new Waiter(waiterName, waiterId);
 
             Order order = new Order(table, waiter);
+            order.printSummary();
             List<Dish> allDishes = menu.getAllDishes();
 
             System.out.println("\n" + "=".repeat(50));

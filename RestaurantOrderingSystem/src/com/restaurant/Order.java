@@ -21,7 +21,16 @@ public class Order implements Serializable {
     private final List<Dish> dishes = new ArrayList<>();
     private double finalPrice; // Final price after discount
     private double discountPercentage; // Discount applied
+    private OrderStatus status = OrderStatus.PLACED;
 
+    public OrderStatus getStatus() {
+        return status;
+    }
+    
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+    
     /**
      * Constructor for creating an Order.
      * 
@@ -189,5 +198,13 @@ public class Order implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(table, waiter);
+    }
+    public void printSummary() {
+        System.out.println("----- ORDER SUMMARY -----");
+        System.out.println("Table: " + table.getTableNumber());
+        System.out.println("Waiter: " + waiter.getName());
+        System.out.println("Status: " + status);
+        System.out.println("Final Price: $" + finalPrice);
+        System.out.println("-------------------------");
     }
 }
