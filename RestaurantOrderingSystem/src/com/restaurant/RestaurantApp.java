@@ -363,7 +363,6 @@ public class RestaurantApp {
             executorService.shutdown();
             try {
                 executorService.awaitTermination(1, TimeUnit.HOURS);
-                System.out.println("\nAll dishes prepared successfully!");
             } catch (InterruptedException e) {
                 System.err.println(messages.getString("preparation_interrupted") + ": " + e.getMessage());
             }
