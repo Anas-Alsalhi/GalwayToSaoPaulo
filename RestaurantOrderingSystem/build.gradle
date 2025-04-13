@@ -3,3 +3,12 @@ dependencies {
     // Removed JUnit dependencies
     // ...existing dependencies...
 }
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['src']
+            include '**/*.properties'
+        }
+    }
+}
