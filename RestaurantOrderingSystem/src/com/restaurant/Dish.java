@@ -2,6 +2,7 @@ package com.restaurant;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * Represents a dish in the menu.
@@ -59,6 +60,11 @@ public class Dish implements Serializable {
     // Add a method to provide a description for the dish
     public String getDescription() {
         return "A delicious " + name + " from the " + category.name().toLowerCase() + " category.";
+    }
+
+    // Added a method to dynamically generate dish descriptions using localized templates
+    public String getLocalizedDescription(ResourceBundle messages) {
+        return String.format(messages.getString("dish.description"), this.name, this.category);
     }
 
     @Override

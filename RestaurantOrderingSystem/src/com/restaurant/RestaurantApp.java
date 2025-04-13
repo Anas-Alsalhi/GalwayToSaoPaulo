@@ -268,7 +268,7 @@ public class RestaurantApp {
                         if (menu.isDishAvailable(selectedDish)) {
                             try {
                                 order.addDish(selectedDish);
-                                System.out.printf(messages.getString("added_dish"), selectedDish.name(), selectedDish.price());
+                                System.out.printf(messages.getString("added_dish_format"), selectedDish.name(), selectedDish.price());
                             } catch (InvalidOrderException e) {
                                 System.out.println(messages.getString("error") + ": " + e.getMessage());
                             }
@@ -460,7 +460,7 @@ if (order != null) {
 
     System.out.println("\n" + messages.getString("vegetarian_dishes"));
     vegetarianDishes.forEach(dish -> 
-        System.out.println(" - " + dish.name() + ": " + messages.getString(dish.getDescription()))
+        System.out.println(" - " + dish.name() + ": " + dish.getLocalizedDescription(messages))
     );
 
     // ✅ Display summary

@@ -89,8 +89,7 @@ public class Menu {
             System.out.println("\n" + messages.getString(category.name()));
             System.out.println("-".repeat(40));
             for (Dish dish : categorizedMenu.get(category)) {
-                System.out.printf("%-3s %-25s (€ %.2f)%n", 
-                    (dishes.indexOf(dish) + 1) + ".", dish.name(), dish.price());
+                System.out.printf(messages.getString("menu_item_format"), dish.name(), dish.price());
             }
         }
 

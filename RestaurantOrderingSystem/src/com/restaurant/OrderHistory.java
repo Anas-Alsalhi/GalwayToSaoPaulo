@@ -119,7 +119,7 @@ public class OrderHistory implements Serializable {
         System.out.println("=".repeat(40));
 
         System.out.println(messages.getString("table_details"));
-        System.out.printf("  %s: %d%n", messages.getString("table_number"), order.getTable().getTableNumber());
+        System.out.printf(messages.getString("table_number_format"), order.getTable().getTableNumber());
         System.out.printf("  %s: %d %s%n", messages.getString("capacity"), order.getTable().getCapacity(), messages.getString("customers"));
         System.out.printf("  %s: %d %s%n", messages.getString("seated_customers"), order.getTable().getCapacity(), messages.getString("customers"));
         System.out.printf("  %s: %s%n", messages.getString("waiter"), order.getWaiter().getName());
