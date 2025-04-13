@@ -338,11 +338,14 @@ public class RestaurantApp {
                     for (int i = 1; i <= count; i++) {
                         int dishIndex = i;
                         try {
-                            // Print preparation message
-                            System.out.printf("Preparing dish: %s (%d of %d)...%n", dishName, dishIndex, count);
+                            String formattedDishName = Arrays.stream(dishName.split(" "))
+                                                             .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+                                                             .collect(Collectors.joining(" "));
+                            String timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                            System.out.printf("[%s] --- Preparing dish: %s (%d of %d) --- %n", timestamp, formattedDishName, dishIndex, count);
                             Thread.sleep(1000 + new Random().nextInt(2000)); // Simulate preparation time
-                            // Print completion message
-                            System.out.printf("Dish prepared: %s (%d of %d)!%n", dishName, dishIndex, count);
+                            timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                            System.out.printf("[%s] >>> Dish prepared: %s (%d of %d)! %n", timestamp, formattedDishName, dishIndex, count);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             System.out.println(messages.getString("preparation_interrupted"));
@@ -354,6 +357,7 @@ public class RestaurantApp {
             executorService.shutdown();
             try {
                 executorService.awaitTermination(1, TimeUnit.HOURS);
+                System.out.println("\nAll dishes prepared successfully!");
             } catch (InterruptedException e) {
                 System.err.println(messages.getString("preparation_interrupted") + ": " + e.getMessage());
             }

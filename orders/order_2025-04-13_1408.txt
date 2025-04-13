@@ -1,0 +1,39 @@
+Order Summary
+=============
+Table Number: 2
+Waiter: Liam
+Seated Customers: 4
+
+Ordered Items:
+- Fish Cake (€6.49)
+- Colcannon (€7.99)
+- Boxty (€7.99)
+- Feijoada (€14.99)
+- Fish Cake (€6.49)
+- Fish Cake (€6.49)
+- Colcannon (€7.99)
+- Fish Cake (€6.49)
+- Bruschetta (€6.99)
+- Salad (€6.99)
+- Pão de Queijo (€5.99)
+
+Subtotal: €84.89
+Discount: 10.00%
+Total After Discount: €76.40
+Order Timestamp: 13/04/2025 14:08
+
+Dish Preparation Logs:
+- Fish Cake (1 of 4) prepared
+- Fish Cake (2 of 4) prepared
+- Fish Cake (3 of 4) prepared
+- Fish Cake (4 of 4) prepared
+- Colcannon (1 of 2) prepared
+- Colcannon (2 of 2) prepared
+- Boxty (1 of 1) prepared
+- Feijoada (1 of 1) prepared
+- Bruschetta (1 of 1) prepared
+- Salad (1 of 1) prepared
+- Pão de Queijo (1 of 1) prepared
+
+Order processed successfully!
+Order added to history.
