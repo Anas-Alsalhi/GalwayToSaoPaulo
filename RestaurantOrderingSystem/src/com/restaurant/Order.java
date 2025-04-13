@@ -203,4 +203,11 @@ public class Order implements Serializable {
         System.out.println("Final Price: $" + finalPrice);
         System.out.println("-------------------------");
     }
+
+    // Add method to generate dish descriptions
+    public List<String> getDishDescriptions() {
+        return dishes.stream()
+            .map(dish -> String.format("%s: %s", dish.name(), dish.getDescription()))
+            .collect(Collectors.toList());
+    }
 }

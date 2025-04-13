@@ -46,9 +46,19 @@ public class Dish implements Serializable {
         return category;
     }
 
+    // Update the isVegetarian method to exclude dishes with meat or fish unless explicitly marked vegetarian
     public boolean isVegetarian() {
-        // Assuming vegetarian dishes are determined by their category
+        // Exclude specific non-vegetarian dishes by name or category
+        if (this.name.equalsIgnoreCase("Fish Cake") || this.category == Category.MAIN_COURSE) {
+            return false;
+        }
+        // Assume all other appetizers and desserts are vegetarian unless specified otherwise
         return this.category == Category.APPETIZER || this.category == Category.DESSERT;
+    }
+
+    // Add a method to provide a description for the dish
+    public String getDescription() {
+        return "A delicious " + name + " from the " + category.name().toLowerCase() + " category.";
     }
 
     @Override

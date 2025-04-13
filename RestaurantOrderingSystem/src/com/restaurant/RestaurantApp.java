@@ -217,6 +217,7 @@ public class RestaurantApp {
     // Method to process a new order.
     // This includes selecting dishes, calculating discounts, and finalizing the order.
     private static void processOrder(Menu menu, Scanner scanner, OrderHistory orderHistory, ResourceBundle messages, Locale locale) {
+        Order order = null;
         try {
             List<Table> tables = List.of(
                     new Table(1, 2),
@@ -231,7 +232,7 @@ public class RestaurantApp {
             int waiterId = random.nextInt(1000);
             Waiter waiter = new Waiter(waiterName, waiterId);
 
-            Order order = new Order(table, waiter);
+            order = new Order(table, waiter);
             order.printSummary();
             List<Dish> allDishes = menu.getAllDishes();
 
@@ -428,44 +429,54 @@ public class RestaurantApp {
             System.err.println(messages.getString("error_processing_order") + ": " + e.getMessage());
         }
 
-        // Example of Predicate to filter vegetarian dishes
-        Predicate<Dish> isVegetarian = Dish::isVegetarian;
-        List<Dish> vegetarianDishes = menu.getAllDishes().stream()
-            .filter(isVegetarian)
-            .collect(Collectors.toList());
+        // Consolidate and display unique ordered dish descriptions
+if (order != null) {
+    // ✅ Build a map of unique dish names to descriptions (first occurrence only)
+    Map<String, String> uniqueDescriptions = new LinkedHashMap<>();
+    order.getDishes().forEach(dish -> 
+        uniqueDescriptions.putIfAbsent(dish.name(), dish.getDescription())
+    );
 
-        // Example of Function to map dish names to prices
-        Function<Dish, String> dishNameToPrice = dish -> dish.name() + " (€" + dish.price() + ")";
-        List<String> dishDescriptions = menu.getAllDishes().stream()
-            .map(dishNameToPrice)
-            .collect(Collectors.toList());
+    // Format for display
+    List<String> uniqueOrderedDishDescriptions = uniqueDescriptions.entrySet().stream()
+        .map(entry -> entry.getKey() + ": " + entry.getValue())
+        .collect(Collectors.toList());
 
-        // Example of Supplier to provide a default dish
-        Supplier<Dish> defaultDishSupplier = () -> new Dish("Default Dish", 0.0, Dish.Category.MAIN_COURSE);
-        Dish defaultDish = defaultDishSupplier.get();
+    System.out.println("\nOrdered Dish Descriptions:");
+    uniqueOrderedDishDescriptions.forEach(System.out::println);
 
-        // Ensure order variable is declared and initialized
-        Order order = new Order(new Table(1, 4), new Waiter("Default Waiter", 1));
+    // ✅ Display order details (with quantities)
+    System.out.println("\nOrder Details:");
+    Map<String, Long> dishQuantities = order.getDishes().stream()
+        .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
+    dishQuantities.forEach((dishName, quantity) ->
+        System.out.println(" - " + dishName + " x" + quantity));
 
-        // Rename the lambda parameter to avoid conflict
-        Consumer<Order> printOrderDetails = o -> {
-            System.out.println("Order Details:");
-            o.getDishes().forEach(dish -> System.out.println(" - " + dish.name()));
-        };
-        printOrderDetails.accept(order);
+    // ✅ Display vegetarian dishes
+    Predicate<Dish> isVegetarian = Dish::isVegetarian;
+    List<Dish> vegetarianDishes = menu.getAllDishes().stream()
+        .filter(isVegetarian)
+        .collect(Collectors.toList());
 
-        // Use vegetarianDishes to display vegetarian options
-        System.out.println("Vegetarian Dishes:");
-        vegetarianDishes.forEach(dish -> System.out.println(" - " + dish.name()));
+    System.out.println("\nVegetarian Dishes:");
+    vegetarianDishes.forEach(dish -> 
+        System.out.println(" - " + dish.name() + ": " + dish.getDescription())
+    );
 
-        // Use dishDescriptions to display dish details
-        System.out.println("\nDish Descriptions:");
-        dishDescriptions.forEach(System.out::println);
+    // ✅ Display summary
+    int totalDishes = order.getDishes().size();
+    double discount = order.getDiscountPercentage();
+    double finalPrice = order.getFinalPrice();
 
-        // Use defaultDish to demonstrate a fallback option
-        System.out.println("\nDefault Dish:");
-        System.out.println(defaultDish.name() + " (€" + defaultDish.price() + ")");
-    }
+    System.out.println();
+    System.out.printf("Total Dishes: %d\n", totalDishes);
+    System.out.printf("Discount Applied: %.2f%%\n", discount);
+    System.out.printf("Total After Discount: €%.2f\n", finalPrice);
+} else {
+    System.out.println("No order was processed.");
+}
+}
+
 
     // Method to book an event.
     // Collects event details such as name, date, time, and guest count.
