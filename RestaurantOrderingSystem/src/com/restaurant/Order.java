@@ -54,14 +54,10 @@ public class Order implements Serializable {
         return Collections.unmodifiableList(dishes);
     }
 
-    // Adds a dish to the order.
-    // Throws an exception if the dish is null or already in the order.
+    // Removes the restriction that prevents adding the same dish multiple times.
     public void addDish(Dish dish) throws InvalidOrderException {
         if (dish == null) {
             throw new InvalidOrderException("Dish cannot be null.");
-        }
-        if (dishes.contains(dish)) {
-            throw new InvalidOrderException("Dish is already in the order.");
         }
         dishes.add(dish);
     }
