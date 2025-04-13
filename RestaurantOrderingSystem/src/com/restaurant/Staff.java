@@ -1,9 +1,6 @@
 package com.restaurant;
 
 import java.io.Serializable;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Represents a staff member in the restaurant.
@@ -53,30 +50,4 @@ public abstract class Staff implements Serializable {
      * Abstract method to be implemented by all subclasses to define their duties.
      */
     public abstract void performDuties();
-
-    /**
-     * Uses a Consumer to print staff details.
-     * @param printer Consumer that accepts a Staff object and prints its details.
-     */
-    public void printDetails(Consumer<Staff> printer) {
-        printer.accept(this);
-    }
-
-    /**
-     * Uses a Supplier to provide the staff name.
-     * @param nameSupplier Supplier that provides the staff name.
-     * @return The staff name provided by the supplier.
-     */
-    public String getName(Supplier<String> nameSupplier) {
-        return nameSupplier.get();
-    }
-
-    /**
-     * Uses a Function to transform the staff name.
-     * @param nameTransformer Function that transforms the staff name.
-     * @return The transformed staff name.
-     */
-    public String transformName(Function<String, String> nameTransformer) {
-        return nameTransformer.apply(this.name);
-    }
 }

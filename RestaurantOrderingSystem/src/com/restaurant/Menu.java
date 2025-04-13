@@ -9,7 +9,6 @@ public class Menu {
 
     private final List<Dish> dishes;
     private final List<Dish> irishDishes; // List of Irish dishes for today's specials
-    private List<Dish> cachedSpecials = null; // Cache for today's specials
 
     /**
      * Constructor for initializing the menu.
@@ -105,12 +104,10 @@ public class Menu {
     // Displays today's specials, which are randomly selected from Irish dishes.
     // The specials remain the same throughout the session.
     public void displayDailySpecials(int limit) {
-        if (cachedSpecials == null) {
-            Collections.shuffle(irishDishes); // Shuffle the mutable list
-            cachedSpecials = new ArrayList<>(irishDishes.stream().limit(limit).toList());
-        }
+        Collections.shuffle(irishDishes); // Shuffle the mutable list
+        List<Dish> dailySpecials = new ArrayList<>(irishDishes.stream().limit(limit).toList());
         System.out.println("\n========== TODAY'S BRAZILIAN AND IRISH SPECIALS ==========");
-        cachedSpecials.forEach(dish ->
+        dailySpecials.forEach(dish ->
             System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price())
         );
         System.out.println("==========================================================");
@@ -144,13 +141,5 @@ public class Menu {
         return dishes.stream()
                      .filter(dish -> dish.name().equalsIgnoreCase(name))
                      .findFirst();
-    }
-
-    public void refreshDailySpecials() {
-        cachedSpecials = null;
-    }
-
-    public void refreshSpecials() {
-        cachedSpecials = null;
     }
 }
