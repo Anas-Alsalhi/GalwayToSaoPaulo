@@ -458,9 +458,9 @@ if (order != null) {
         .filter(isVegetarian)
         .collect(Collectors.toList());
 
-    System.out.println("\nVegetarian Dishes:");
+    System.out.println("\n" + messages.getString("vegetarian_dishes"));
     vegetarianDishes.forEach(dish -> 
-        System.out.println(" - " + dish.name() + ": " + dish.getDescription())
+        System.out.println(" - " + dish.name() + ": " + messages.getString(dish.getDescription()))
     );
 
     // ✅ Display summary
@@ -469,12 +469,23 @@ if (order != null) {
     double finalPrice = order.getFinalPrice();
 
     System.out.println();
-    System.out.printf("Total Dishes: %d\n", totalDishes);
-    System.out.printf("Discount Applied: %.2f%%\n", discount);
+    System.out.printf(messages.getString("total.dishes") + "\n", totalDishes);
+    System.out.printf(messages.getString("discount.applied") + "\n", discount);
     System.out.printf(messages.getString("total.after.discount") + "\n", finalPrice);
 } else {
     System.out.println("No order was processed.");
 }
+
+// ✅ Display ordered dish descriptions
+    System.out.println("\n" + messages.getString("ordered_dish_descriptions"));
+    Map<String, String> uniqueDescriptions = new LinkedHashMap<>();
+    order.getDishes().forEach(dish -> 
+        uniqueDescriptions.putIfAbsent(dish.name(), dish.getDescription())
+    );
+
+    uniqueDescriptions.forEach((dishName, description) -> 
+        System.out.println(" - " + dishName + ": " + description)
+    );
 }
 
 
