@@ -23,6 +23,7 @@ public class Order implements Serializable {
     private double finalPrice; // Final price after discount
     private double discountPercentage; // Discount applied
     private OrderStatus status = OrderStatus.PLACED;
+    private final ResourceBundle messages;
 
     public OrderStatus getStatus() {
         return status;
@@ -37,10 +38,12 @@ public class Order implements Serializable {
      * 
      * @param table  The table associated with the order.
      * @param waiter The waiter serving the order.
+     * @param messages The resource bundle for localized messages.
      */
-    public Order(Table table, Waiter waiter) {
+    public Order(Table table, Waiter waiter, ResourceBundle messages) {
         this.table = table;
         this.waiter = waiter;
+        this.messages = messages;
     }
 
     public Table getTable() {
@@ -102,7 +105,6 @@ public class Order implements Serializable {
         Map<Dish, Long> dishCounts = dishes.stream()
             .collect(Collectors.groupingBy(d -> d, Collectors.counting()));
     
-        ResourceBundle messages = ResourceBundle.getBundle("com.restaurant.messages");
         String localizedTitle = messages.getString("order_for_table").replace("{tableNumber}", String.valueOf(table.getTableNumber()));
         String titleRow = String.format("| %-58s |", localizedTitle);
         String border = "+-----+------------------------------+------------+----------+";
@@ -164,7 +166,8 @@ public class Order implements Serializable {
 
         Table table = new Table(tableNumber, 4); // Replace with a lookup or configuration
         Waiter waiter = new Waiter(waiterName, waiterId);
-        Order order = new Order(table, waiter);
+        ResourceBundle messages = ResourceBundle.getBundle("com.restaurant.messages");
+        Order order = new Order(table, waiter, messages);
 
         List<String> failedDishes = new ArrayList<>();
         Arrays.stream(parts, 3, parts.length)
@@ -202,12 +205,7 @@ public class Order implements Serializable {
         return Objects.hash(table, waiter);
     }
     public void printSummary() {
-        System.out.println("----- ORDER SUMMARY -----");
-        System.out.println("Table: " + table.getTableNumber());
-        System.out.println("Waiter: " + waiter.getName());
-        System.out.println("Status: " + status);
-        System.out.println("Final Price: $" + finalPrice);
-        System.out.println("-------------------------");
+        System.out.println(messages.getString("start_selecting_menu"));
     }
 
     // Add method to generate dish descriptions

@@ -241,7 +241,7 @@ public class RestaurantApp {
             int waiterId = random.nextInt(1000);
             Waiter waiter = new Waiter(waiterName, waiterId);
 
-            order = new Order(table, waiter);
+            order = new Order(table, waiter, messages);
             order.printSummary();
             List<Dish> allDishes = menu.getAllDishes();
 
