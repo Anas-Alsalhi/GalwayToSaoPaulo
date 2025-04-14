@@ -11,8 +11,8 @@ import java.util.Objects;
  */
 public final class Waiter extends Staff {
 
-    private int waiterId; // Unique identifier for the waiter
-    private List<Table> assignedTables; // List of tables assigned to the waiter
+    private final int waiterId; // Unique identifier for the waiter
+    private final List<Table> assignedTables; // List of tables assigned to the waiter
 
     /**
      * Default constructor for deserialization.
