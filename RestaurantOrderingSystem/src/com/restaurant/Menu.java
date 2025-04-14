@@ -9,6 +9,7 @@ public class Menu {
 
     private final List<Dish> dishes;
     private final List<Dish> irishDishes; // List of Irish dishes for today's specials
+    private List<Dish> cachedSpecials; // Cache for today's specials
 
     /**
      * Constructor for initializing the menu.
@@ -58,6 +59,8 @@ public class Menu {
             new Dish("Pizza", 10.99, Dish.Category.MAIN_COURSE), // Adjusted price
             new Dish("Pineapple Juice", 3.99, Dish.Category.BEVERAGE) // Adjusted price
         ));
+
+        cachedSpecials = null; // Initialize the cache
     }
 
     /**
@@ -75,7 +78,7 @@ public class Menu {
             categorizedMenu.get(dish.category()).add(dish);
         }
 
-        if (categorizedMenu == null || categorizedMenu.isEmpty()) {
+        if (categorizedMenu.isEmpty()) {
             System.out.println(messages.getString("menu_empty"));
             return;
         }
@@ -89,7 +92,7 @@ public class Menu {
             System.out.println("\n" + messages.getString(category.name()));
             System.out.println("-".repeat(40));
             for (Dish dish : categorizedMenu.get(category)) {
-                System.out.printf(messages.getString("menu_item_format"), dish.name(), dish.price());
+                System.out.printf(messages.getString("menu_item_format") + "%n", dish.name(), dish.price());
             }
         }
 
@@ -103,10 +106,13 @@ public class Menu {
     // Displays today's specials, which are randomly selected from Irish dishes.
     // The specials remain the same throughout the session.
     public void displayDailySpecials(int limit) {
-        Collections.shuffle(irishDishes); // Shuffle the mutable list
-        List<Dish> dailySpecials = new ArrayList<>(irishDishes.stream().limit(limit).toList());
+        if (cachedSpecials == null) { // Check if specials are already cached
+            Collections.shuffle(irishDishes); // Shuffle the mutable list
+            cachedSpecials = new ArrayList<>(irishDishes.stream().limit(limit).toList());
+        }
+
         System.out.println("\n========== TODAY'S BRAZILIAN AND IRISH SPECIALS ==========");
-        dailySpecials.forEach(dish ->
+        cachedSpecials.forEach(dish ->
             System.out.printf(" - %-25s (€%.2f)%n", dish.name(), dish.price())
         );
         System.out.println("==========================================================");

@@ -1,17 +1,17 @@
 package com.restaurant;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
-import java.time.*;
-import java.time.format.*;
-import java.text.SimpleDateFormat;
-import java.nio.file.Files;
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 public class RestaurantApp {
 
@@ -78,8 +78,12 @@ public class RestaurantApp {
                 }
             }
 
-            // Display a goodbye message before the application exits.
-            System.out.println(messages.getString("goodbye"));
+            // Ensure messages is not null before using it
+            if (messages != null) {
+                System.out.println(messages.getString("goodbye"));
+            } else {
+                System.err.println("Error: Resource bundle 'messages' is not initialized. Goodbye message cannot be displayed.");
+            }
         } catch (Exception e) {
             System.err.println("Failed to initialize the application: " + e.getMessage());
         }
@@ -89,7 +93,7 @@ public class RestaurantApp {
     private static void printLanguageSelectionMenu() {
         System.out.println("============================================");
         System.out.println("Select a language:");
-        // List of supported languages.
+        // List of supported languages. 
         System.out.println("1. English");
         System.out.println("2. Portuguese");
         System.out.println("3. French");
@@ -217,6 +221,10 @@ public class RestaurantApp {
     // Method to process a new order.
     // This includes selecting dishes, calculating discounts, and finalizing the order.
     private static void processOrder(Menu menu, Scanner scanner, OrderHistory orderHistory, ResourceBundle messages, Locale locale) {
+        if (messages == null) {
+            System.err.println("Error: Resource bundle 'messages' is not initialized. Exiting application.");
+            return;
+        }
         Order order = null;
         try {
             List<Table> tables = List.of(
@@ -331,8 +339,8 @@ public class RestaurantApp {
             Map<String, Long> dishCounts = order.getDishes().stream()
                 .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
 
-            // Process dishes with ExecutorCompletionService for parallel preparation
-            ExecutorService executorService = Executors.newFixedThreadPool(4);
+            // Replace Thread.sleep with ScheduledExecutorService for non-blocking delays
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
 
             List<String> orderedDishNames = order.getDishes().stream()
                 .map(Dish::name)
@@ -342,29 +350,32 @@ public class RestaurantApp {
             for (String dishName : orderedDishNames) {
                 long count = dishCounts.get(dishName);
 
-                executorService.submit(() -> {
-                    for (int i = 1; i <= count; i++) {
-                        int dishIndex = i;
+                for (int i = 1; i <= count; i++) {
+                    int dishIndex = i;
+                    scheduler.schedule(() -> {
                         try {
                             String formattedDishName = Arrays.stream(dishName.split(" "))
                                                              .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
                                                              .collect(Collectors.joining(" "));
                             String timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
                             System.out.printf("[%s] --- Preparing dish: %s (%d of %d) --- %n", timestamp, formattedDishName, dishIndex, count);
-                            Thread.sleep(1000 + new Random().nextInt(2000)); // Simulate preparation time
+                            
+                            // Simulate preparation time
+                            TimeUnit.MILLISECONDS.sleep(1000 + new Random().nextInt(2000));
+
                             timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
                             System.out.printf("[%s] >>> Dish prepared: %s (%d of %d)! %n", timestamp, formattedDishName, dishIndex, count);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             System.out.println(messages.getString("preparation_interrupted"));
                         }
-                    }
-                });
+                    }, 1000 + new Random().nextInt(2000), TimeUnit.MILLISECONDS);
+                }
             }
 
-            executorService.shutdown();
+            scheduler.shutdown();
             try {
-                executorService.awaitTermination(1, TimeUnit.HOURS);
+                scheduler.awaitTermination(1, TimeUnit.HOURS);
             } catch (InterruptedException e) {
                 System.err.println(messages.getString("preparation_interrupted") + ": " + e.getMessage());
             }
@@ -430,39 +441,50 @@ public class RestaurantApp {
         }
 
         // Consolidate and display unique ordered dish descriptions
+        // Build a map of unique dish names to descriptions (first occurrence only)
+        Map<String, String> uniqueDescriptions = new LinkedHashMap<>();
+        // Ensure order is not null before accessing its methods
         if (order != null) {
-            // Build a map of unique dish names to descriptions (first occurrence only)
-            Map<String, String> uniqueDescriptions = new LinkedHashMap<>();
             order.getDishes().forEach(dish -> 
                 uniqueDescriptions.putIfAbsent(dish.name(), dish.getDescription())
             );
+        } else {
+            System.err.println("Error: Order object is null. Cannot process dishes.");
+        }
 
-            // Format for display
-            System.out.println("\nOrdered Dish Descriptions:");
-            uniqueDescriptions.forEach((dishName, description) -> 
-                System.out.println(" - " + dishName + ": " + description)
-            );
+        // Format for display
+        System.out.println("\nOrdered Dish Descriptions:");
+        uniqueDescriptions.forEach((dishName, description) -> 
+            System.out.println(" - " + dishName + ": " + description)
+        );
 
-            // Display order details (with quantities)
-            System.out.println("\nOrder Details:");
+        // Display order details (with quantities)
+        System.out.println("\nOrder Details:");
+        // Ensure order is not null before accessing its methods
+        if (order != null) {
             Map<String, Long> dishQuantities = order.getDishes().stream()
                 .collect(Collectors.groupingBy(Dish::name, Collectors.counting()));
             dishQuantities.forEach((dishName, quantity) ->
                 System.out.println(" - " + dishName + " x" + quantity)
             );
+        } else {
+            System.err.println("Error: Order object is null. Cannot display order details.");
+        }
 
-            // Display vegetarian dishes
-            Predicate<Dish> isVegetarian = Dish::isVegetarian;
-            List<Dish> vegetarianDishes = menu.getAllDishes().stream()
-                .filter(isVegetarian)
-                .collect(Collectors.toList());
+        // Display vegetarian dishes
+        Predicate<Dish> isVegetarian = Dish::isVegetarian;
+        List<Dish> vegetarianDishes = menu.getAllDishes().stream()
+            .filter(isVegetarian)
+            .collect(Collectors.toList());
 
-            System.out.println("\nVegetarian Dishes:");
-            vegetarianDishes.forEach(dish -> 
-                System.out.println(" - " + dish.name() + ": " + dish.getLocalizedDescription(messages))
-            );
+        System.out.println("\nVegetarian Dishes:");
+        vegetarianDishes.forEach(dish -> 
+            System.out.println(" - " + dish.name() + ": " + dish.getLocalizedDescription(messages))
+        );
 
-            // Display summary
+        // Display summary
+        // Ensure order is not null before accessing its methods
+        if (order != null) {
             int totalDishes = order.getDishes().size();
             double discount = order.getDiscountPercentage();
             double finalPrice = order.getFinalPrice();
@@ -472,7 +494,7 @@ public class RestaurantApp {
             System.out.printf("Discount applied: %.2f%%\n", discount);
             System.out.printf("Total after discount: €%.2f\n", finalPrice);
         } else {
-            System.out.println("No order was processed.");
+            System.err.println("Error: Order object is null. Cannot display summary.");
         }
     }
 
@@ -556,10 +578,9 @@ public class RestaurantApp {
         List<Dish> recommendedDishes = dishFrequency.entrySet().stream()
             .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
             .limit(3)
-            .map(entry -> menu.getAllDishes().stream() // Use menu instance to access dishes
+            .map(entry -> menu.getAllDishes().stream()
                 .filter(dish -> dish.name().equals(entry.getKey()))
-                .findFirst().orElse(null))
-            .filter(dish -> dish != null)
+                .findFirst().orElseThrow(() -> new IllegalStateException("Dish not found")))
             .collect(Collectors.toList());
 
         if (recommendedDishes.isEmpty()) {

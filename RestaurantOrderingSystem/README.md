@@ -1,45 +1,56 @@
-# Restaurant Ordering System
+## Getting Started
 
-The Restaurant Ordering System is a console-based application designed to streamline the operations of a restaurant. It supports multiple languages and provides features for managing orders, viewing menus, booking events, and more.
+Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+
+## Restaurant Ordering System
+
+The Restaurant Ordering System is a Java-based application designed to streamline the operations of a restaurant. It provides features for managing menus, processing customer orders, booking events, and maintaining order history. The application supports multiple languages, making it accessible to a diverse user base.
 
 ## Features
 
-- Multi-language Support: The application supports 10 languages, including English, Portuguese, French, Italian, Spanish, German, Chinese, Russian, Norwegian, and Japanese.
-- Menu Management: View the restaurant's menu categorized by dish type (Appetizers, Main Courses, Desserts, Beverages).
-- Daily Specials: Display a selection of daily specials chosen randomly from the menu.
-- Order Processing: Place and process orders, including applying discounts, generating order summaries, and saving dish preparation logs.
-- Order History: Save, load, and view the history of all orders. History can be saved/loaded as text or binary files.
-- Event Booking: Book events with details such as event name, date, time, and guest count.
-- AI-Powered Recommendations: Get dish recommendations based on order history.
-- Error Handling: Handles invalid inputs, missing resource bundles, and other edge cases gracefully.
+- Menu Management**: View the restaurant's menu categorized by dish type, including appetizers, main courses, desserts, and beverages.
+- Order Processing**: Place and process customer orders, including applying discounts and generating order summaries.
+- Order History**: Save and load order history to/from files, and view past orders.
+- Event Booking**: Book events with details such as event name, date, time, and guest count.
+- AI-Powered Recommendations**: Get dish recommendations based on order history.
+- Multi-Language Support**: Choose from 10 supported languages for a localized experience.
 
-## How to Use
+## Folder Structure
 
-1. Language Selection: Upon starting the application, select your preferred language from the list of supported languages.
-2. Main Menu: Choose from various options such as viewing the menu, placing an order, or booking an event.
-3. Order Management: Add dishes to your order, apply discounts, and finalize the order. Dish preparation logs are saved in the order summary.
-4. Event Booking: Provide event details to book an event at the restaurant.
-5. Recommendations: View AI-powered dish recommendations based on past orders.
-6. Order History: Save or load order history as text or binary files.
+The workspace contains the following folders:
 
-## Technologies Used
+- `src`: Contains the source code of the application.
+- `bin`: Contains the compiled output files.
+- `lib`: Contains dependencies required by the application.
+- `orders`: Stores order summaries and history files.
 
-- Java: The application is implemented in Java.
-- Resource Bundles: Used for multi-language support.
-- Concurrency: Utilized for simulating dish preparation in parallel.
-- Serialization: Used for saving and loading order history.
+## How to Run
 
-## Getting Started
+1. Clone the repository to your local machine.
+2. Open the project in Visual Studio Code or your preferred Java IDE.
+3. Compile the project using the built-in Java tools.
+4. Run the `RestaurantApp` class to start the application.
 
-1. Clone the repository or download the project files.
-2. Open the project in an IDE such as Eclipse or IntelliJ IDEA.
-3. Run the `RestaurantApp` class to start the application.
+## Dependencies
 
-## Project Structure
+The application uses standard Java libraries and does not require additional dependencies. Ensure you have Java 11 or later installed on your system.
 
-- `src/com/restaurant`: Contains the main application code, including classes for menu, orders, staff, and more.
-- `src/com/restaurant/messages_<locale>.properties`: Language-specific resource files for translations.
-- `README.md`: This file, providing an overview of the project.
+## Supported Languages
+
+- English
+- Portuguese
+- French
+- Italian
+- Spanish
+- German
+- Chinese
+- Russian
+- Norwegian
+- Japanese
+
+## Contribution
+
+Contributions are welcome! Feel free to fork the repository and submit pull requests for new features or bug fixes.
 
 ## License
 

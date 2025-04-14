@@ -2,11 +2,11 @@ package com.restaurant;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -135,6 +135,9 @@ public class Order implements Serializable {
     public static Order parse(String orderString, Menu menu) {
         if (orderString == null || orderString.isBlank()) {
             throw new IllegalArgumentException("Order string cannot be null or empty.");
+        }
+        if (menu == null) {
+            throw new IllegalArgumentException("Menu cannot be null.");
         }
 
         String[] parts = orderString.split(",");

@@ -2,15 +2,15 @@ package com.restaurant;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Manages the history of orders.
@@ -98,8 +98,16 @@ public class OrderHistory implements Serializable {
             orders.clear();
             String line;
             while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    System.err.println("Skipping blank line in file.");
+                    continue;
+                }
                 Order order = Order.parse(line, getMenu()); // Ensure Order.parse supports text parsing
-                orders.add(order);
+                if (order != null) {
+                    orders.add(order);
+                } else {
+                    System.err.println("Failed to parse order: " + line);
+                }
             }
             System.out.println("Order history loaded from text successfully.");
         } catch (IOException | IllegalArgumentException e) {
