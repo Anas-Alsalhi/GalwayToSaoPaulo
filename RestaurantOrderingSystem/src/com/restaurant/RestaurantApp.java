@@ -226,6 +226,7 @@ public class RestaurantApp {
             return;
         }
         Order order = null;
+        double discount = 0;
         try {
             List<Table> tables = List.of(
                     new Table(1, 2),
@@ -304,7 +305,6 @@ public class RestaurantApp {
             double total = order.getDishes().stream().mapToDouble(Dish::price).sum();
             System.out.println(String.format("\n%s", String.format(messages.getString("subtotal"), total)));
 
-            double discount = 0;
             while (true) {
                 System.out.print(messages.getString("enter_discount").replace("(0-25)", "(0-25%)"));
                 String discountInput = scanner.nextLine().trim();
@@ -354,17 +354,16 @@ public class RestaurantApp {
                     int dishIndex = i;
                     scheduler.schedule(() -> {
                         try {
-                            String formattedDishName = Arrays.stream(dishName.split(" "))
-                                                             .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
-                                                             .collect(Collectors.joining(" "));
+                            // Use the original casing of dish names from the menu
+                            String originalDishName = dishName;
                             String timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-                            System.out.printf("[%s] --- Preparing dish: %s (%d of %d) --- %n", timestamp, formattedDishName, dishIndex, count);
-                            
+                            System.out.printf("[%s] --- Preparing dish: %s (%d of %d) --- %n", timestamp, originalDishName, dishIndex, count);
+
                             // Simulate preparation time
                             TimeUnit.MILLISECONDS.sleep(1000 + new Random().nextInt(2000));
 
                             timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-                            System.out.printf("[%s] >>> Dish prepared: %s (%d of %d)! %n", timestamp, formattedDishName, dishIndex, count);
+                            System.out.printf("[%s] >>> Dish prepared: %s (%d of %d)! %n", timestamp, originalDishName, dishIndex, count);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             System.out.println(messages.getString("preparation_interrupted"));

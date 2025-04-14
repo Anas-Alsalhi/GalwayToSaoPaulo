@@ -57,9 +57,21 @@ public class Dish implements Serializable {
         return this.category == Category.APPETIZER || this.category == Category.DESSERT;
     }
 
-    // Add a method to provide a description for the dish
+    // Refactored to provide unique, flavorful descriptions for each dish
     public String getDescription() {
-        return "A delicious " + name + " from the " + category.name().toLowerCase() + " category.";
+        return switch (name.toLowerCase()) {
+            case "pão de queijo" -> "Golden, cheesy Brazilian cheese bread, crispy on the outside and soft on the inside.";
+            case "irish stew" -> "A hearty Irish classic with tender lamb, potatoes, and root vegetables simmered to perfection.";
+            case "baileys cheesecake" -> "A creamy cheesecake infused with the rich, velvety flavor of Baileys Irish Cream.";
+            case "fish and chips" -> "Crispy battered fish served with golden fries, a beloved British and Irish favorite.";
+            case "shepherd's pie" -> "A comforting dish of seasoned minced lamb topped with creamy mashed potatoes, baked to golden perfection.";
+            case "tea" -> "A soothing cup of traditional tea, perfect for any time of the day.";
+            case "coffee" -> "Rich, aromatic coffee brewed to awaken your senses.";
+            case "salad" -> "A crisp, refreshing mix of garden-fresh greens with a zesty vinaigrette.";
+            case "pizza" -> "A classic favorite with a thin crust, tangy tomato sauce, and melted cheese.";
+            case "feijoada" -> "A traditional Brazilian black bean stew with savory pork, served with rice and orange slices.";
+            default -> "A delightful dish to tantalize your taste buds.";
+        };
     }
 
     // Added a method to dynamically generate dish descriptions using localized templates
