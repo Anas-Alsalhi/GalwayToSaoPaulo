@@ -205,6 +205,7 @@ public class Order implements Serializable {
         return Objects.hash(table, waiter);
     }
     public void printSummary() {
+        System.out.println();
         System.out.println(messages.getString("start_selecting_menu"));
     }
 
