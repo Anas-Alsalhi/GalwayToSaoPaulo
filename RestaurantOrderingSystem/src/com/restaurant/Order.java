@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
@@ -101,8 +102,10 @@ public class Order implements Serializable {
         Map<Dish, Long> dishCounts = dishes.stream()
             .collect(Collectors.groupingBy(d -> d, Collectors.counting()));
     
+        ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+        String localizedTitle = messages.getString("order_for_table").replace("{tableNumber}", String.valueOf(table.getTableNumber()));
+        String titleRow = String.format("| %-58s |", localizedTitle);
         String border = "+-----+------------------------------+------------+----------+";
-        String titleRow = String.format("| %-58s |", "Order for Table " + table.getTableNumber());
         String header = String.format("| %-3s | %-28s | %10s | %8s |", "#", "Dish", "Price", "Quantity");
     
         // Print table
