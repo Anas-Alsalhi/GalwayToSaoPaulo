@@ -226,7 +226,7 @@ public class RestaurantApp {
             return;
         }
         Order order = null;
-        double discount = 0;
+        double discount = 0; // Ensure this is the only declaration of 'discount'
         try {
             List<Table> tables = List.of(
                     new Table(1, 2),
@@ -314,7 +314,7 @@ public class RestaurantApp {
                 }
 
                 try {
-                    discount = Double.parseDouble(discountInput);
+                    discount = Double.parseDouble(discountInput); // Use the existing 'discount' variable
                     if (discount >= 0 && discount <= 25) {
                         break;
                     } else {
@@ -485,7 +485,7 @@ public class RestaurantApp {
         // Ensure order is not null before accessing its methods
         if (order != null) {
             int totalDishes = order.getDishes().size();
-            double discount = order.getDiscountPercentage();
+            // Removed unused assignment to avoid the compile error
             double finalPrice = order.getFinalPrice();
 
             System.out.println();
