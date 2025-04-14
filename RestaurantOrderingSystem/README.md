@@ -8,12 +8,14 @@ The Restaurant Ordering System is a Java-based application designed to streamlin
 
 ## Features
 
-- Menu Management**: View the restaurant's menu categorized by dish type, including appetizers, main courses, desserts, and beverages.
-- Order Processing**: Place and process customer orders, including applying discounts and generating order summaries.
-- Order History**: Save and load order history to/from files, and view past orders.
-- Event Booking**: Book events with details such as event name, date, time, and guest count.
-- AI-Powered Recommendations**: Get dish recommendations based on order history.
-- Multi-Language Support**: Choose from 10 supported languages for a localized experience.
+- Menu Management: View the restaurant's menu categorized by dish type, including appetizers, main courses, desserts, and beverages.
+- Order Processing: Place and process customer orders, including applying discounts and generating order summaries.
+- Order History: Save and load order history to/from files, including support for both binary and text formats.
+- Event Booking: Book events with details such as event name, date, time, and guest count.
+- AI-Powered Recommendations: Get dish recommendations based on order history using AI-powered logic.
+- Localized Dish Descriptions: View unique, localized descriptions for each dish in the menu.
+- Order Status Tracking: Track the status of orders (e.g., placed, in progress, served).
+- Multi-Language Support: Choose from 10 supported languages for a localized experience.
 
 ## Folder Structure
 
