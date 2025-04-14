@@ -102,7 +102,7 @@ public class Order implements Serializable {
         Map<Dish, Long> dishCounts = dishes.stream()
             .collect(Collectors.groupingBy(d -> d, Collectors.counting()));
     
-        ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+        ResourceBundle messages = ResourceBundle.getBundle("com.restaurant.messages");
         String localizedTitle = messages.getString("order_for_table").replace("{tableNumber}", String.valueOf(table.getTableNumber()));
         String titleRow = String.format("| %-58s |", localizedTitle);
         String border = "+-----+------------------------------+------------+----------+";

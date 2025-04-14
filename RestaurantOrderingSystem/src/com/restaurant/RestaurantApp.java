@@ -477,7 +477,7 @@ public class RestaurantApp {
             .filter(isVegetarian)
             .collect(Collectors.toList());
 
-        System.out.println("\nVegetarian Dishes:");
+        System.out.println("\n" + String.format(messages.getString("vegetarian_dishes"), vegetarianDishes.size()));
         vegetarianDishes.forEach(dish -> 
             System.out.println(" - " + dish.name() + ": " + dish.getLocalizedDescription(messages))
         );
@@ -490,9 +490,8 @@ public class RestaurantApp {
             double finalPrice = order.getFinalPrice();
 
             System.out.println();
-            System.out.printf("Total dishes: %d\n", totalDishes);
-            System.out.printf("Discount applied: %.2f%%\n", discount);
-            System.out.printf("Total after discount: €%.2f\n", finalPrice);
+            System.out.printf(messages.getString("total_dishes") + "\n", totalDishes);
+            System.out.printf(messages.getString("total_after_discount") + "\n", finalPrice);
         } else {
             System.err.println("Error: Order object is null. Cannot display summary.");
         }
